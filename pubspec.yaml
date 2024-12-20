@@ -38,10 +38,21 @@ dependencies:
   cupertino_icons: ^1.0.8
   dio: ^5.7.0
   shared_preferences: ^2.0.18
+  google_maps_flutter: ^2.2.1
   
   provider: ^6.1.2
+  flutter_launcher_icons: ^0.14.2
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/luncher_icon.png"
+
+
 
 dev_dependencies:
+
+
+
   flutter_test:
     sdk: flutter
 
@@ -66,6 +77,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/icons/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
