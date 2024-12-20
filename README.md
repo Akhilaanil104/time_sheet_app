@@ -41,8 +41,8 @@
     <h3>Steps to Run the App</h3>
     <ol>
         <li>Clone the repository:</li>
-        <pre><code>git clone https://github.com/your-username/timesheet-app.git</code></pre>
-        <pre><code>cd timesheet-app</code></pre>
+        <pre><code>git clone https://github.com/Akhilaanil104/time_sheet_app.git</code></pre>
+        <pre><code>cd time_sheet_app</code></pre>
         <li>Install dependencies:</li>
         <pre><code>flutter pub get</code></pre>
         <li>Configure API: Make sure to configure the API base URL and endpoint properly in your app.</li>
