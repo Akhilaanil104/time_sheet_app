@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timesheet Application - Basic Version</title>
 </head>
 <body>
 
@@ -30,7 +31,19 @@
         <li>Dio for network requests</li>
     </ul>
 
- <h2>Installation</h2>
+<h2>Download and Install</h2>
+<p>You can download the APK file for the Timesheet Application using the link below:</p>
+<ul>
+    <li><a href="Application\app-release.apk" target="_blank">Download Timesheet App APK</a></li>
+</ul>
+<p>Steps to install:</p>
+<ol>
+    <li>Download the APK file from the link above.</li>
+    <li>Allow installation of apps from unknown sources in your device settings (if not already enabled).</li>
+    <li>Open the downloaded APK file and follow the installation instructions.</li>
+</ol>
+
+<h2>Installation</h2>
     <h3>Prerequisites</h3>
     <ul>
         <li>Install Flutter from <a href="https://flutter.dev/docs/get-started/install">flutter.dev</a>.</li>
@@ -53,25 +66,25 @@
    <h2>Screenshots</h2>
     <h3>Login Screen</h3>
     <figure>
-        <img src="assets\images\SCREENSHOT5.jpg" alt="Login Screen" width="400">
+        <img src="assets/images/SCREENSHOT5.jpg" alt="Login Screen" width="400">
         <figcaption>Login screen where users authenticate using the API.</figcaption>
     </figure>
 
   <h3>Project List Screen</h3>
     <figure>
-        <img src="assets\images\SCREENSHOT1.jpg" alt="Project List Screen" width="400">
+        <img src="assets/images/SCREENSHOT1.jpg" alt="Project List Screen" width="400">
         <figcaption>Displays the list of assigned projects for the logged-in user.</figcaption>
     </figure>
 
    <h3>Task List Screen</h3>
     <figure>
-        <img src="assets\images\SCREENSHOT2.jpg" alt="Task List Screen" width="400">
+        <img src="assets/images/SCREENSHOT2.jpg" alt="Task List Screen" width="400">
         <figcaption>Displays the list of tasks associated with the selected project.</figcaption>
     </figure>
     
 <h3>Project Details Screen with Google Maps</h3>
 <figure>
-    <img src="assets\images\SCREENSHOT3.jpg" alt="Project Details with Google Maps" width="400">
+    <img src="assets/images/SCREENSHOT3.jpg" alt="Project Details with Google Maps" width="400">
     <figcaption>Displays detailed project information along with the location on Google Maps for the selected project.</figcaption>
 </figure>
 
@@ -92,3 +105,4 @@
 
 </body>
 </html>
+****
