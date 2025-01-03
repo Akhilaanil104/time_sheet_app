@@ -326,7 +326,7 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
   String currentLocation = '';
   String locationName = ''; 
   String taskStatus = 'To Do';
-  String comment = '';// New variable for location name
+  String comment = '';
   Position? _currentPosition;
   late GoogleMapController mapController;
   Set<Marker> _markers = {};
@@ -483,62 +483,62 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
                 style: const TextStyle(color: Colors.white),
               ),
             ),
-            const SizedBox(height: 20),
+            // const SizedBox(height: 20),
 
-            // Status Section
-            const Text(
-              'Status',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const SizedBox(width: 10),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: taskStatus,
-                    items: ['To Do', 'In Progress', 'Completed']
-                        .map((status) => DropdownMenuItem(
-                              value: status,
-                              child: Text(status),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        taskStatus = value!;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+            // // Status Section
+            // const Text(
+            //   'Status',
+            //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // ),
+            // const SizedBox(height: 10),
+            // Row(
+            //   children: [
+            //     const SizedBox(width: 10),
+            //     Expanded(
+            //       child: DropdownButtonFormField<String>(
+            //         value: taskStatus,
+            //         items: ['To Do', 'In Progress', 'Completed']
+            //             .map((status) => DropdownMenuItem(
+            //                   value: status,
+            //                   child: Text(status),
+            //                 ))
+            //             .toList(),
+            //         onChanged: (value) {
+            //           setState(() {
+            //             taskStatus = value!;
+            //           });
+            //         },
+            //         decoration: InputDecoration(
+            //           border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(8),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 20),
 
-            // Add Comments Section
-            const Text(
-              'Add Comments',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Enter your comments here',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  comment = value;
-                });
-              },
-            ),
+            // // Add Comments Section
+            // const Text(
+            //   'Add Comments',
+            //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // ),
+            // const SizedBox(height: 10),
+            // TextField(
+            //   maxLines: 3,
+            //   decoration: InputDecoration(
+            //     hintText: 'Enter your comments here',
+            //     border: OutlineInputBorder(
+            //       borderRadius: BorderRadius.circular(12),
+            //     ),
+            //   ),
+            //   onChanged: (value) {
+            //     setState(() {
+            //       comment = value;
+            //     });
+            //   },
+            // ),
             
 
             const SizedBox(height: 20),
@@ -598,7 +598,64 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
                 ),
               ),
             ],
+             const SizedBox(height: 20),
+
+            // Status Section
+            const Text(
+              'Status',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const SizedBox(width: 10),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: taskStatus,
+                    items: ['To Do', 'In Progress', 'Completed']
+                        .map((status) => DropdownMenuItem(
+                              value: status,
+                              child: Text(status),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        taskStatus = value!;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Add Comments Section
+            const Text(
+              'Add Comments',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Enter your comments here',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  comment = value;
+                });
+              },
+            ),
           ],
+          
         ),
       ),
     );
