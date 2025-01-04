@@ -29,13 +29,18 @@
 //       appBar: AppBar(leading: Text(widget.project_name)),
 //       body: Column(
 //         children: [
-//           Text("hello",style:TextStyle( Align(alignment: AlignmentDirectional.bottomCenter,).center,)
+//           Text("hello",style:TextStyle( ),textAlign: TextAlign.center,),
+//           Spacer(),
+//           Image.network(),
+        
 
 //         ],
 //       ),
 //     );
 //   }
 // }
+
+
 
 
 
