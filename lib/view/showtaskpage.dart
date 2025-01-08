@@ -1,2009 +1,3 @@
-
-
-// // // // // // // import 'package:flutter/material.dart';
-// // // // // // // import 'package:google_maps_flutter/google_maps_flutter.dart';
-// // // // // // // import 'package:geolocator/geolocator.dart';
-
-// // // // // // // class ShowTaskPage extends StatefulWidget {
-// // // // // // //   final String taskId;
-// // // // // // //   final String title;
-// // // // // // //   final String description;
-
-// // // // // // //   const ShowTaskPage({
-// // // // // // //     super.key,
-// // // // // // //     required this.taskId,
-// // // // // // //     required this.title,
-// // // // // // //     required this.description,
-// // // // // // //   });
-
-// // // // // // //   @override
-// // // // // // //   State<ShowTaskPage> createState() => _ShowTaskPageState();
-// // // // // // // }
-
-// // // // // // // class _ShowTaskPageState extends State<ShowTaskPage> {
-// // // // // // //   bool isTaskStarted = false; // Whether the task is started or not
-// // // // // // //   String taskStatus = "Todo"; // Default task status
-// // // // // // //   final TextEditingController _commentController = TextEditingController();
-// // // // // // //   final List<String> comments = [];
-// // // // // // //   Position? _currentPosition;
-// // // // // // //   late GoogleMapController mapController;
-// // // // // // //   Set<Marker> _markers = {};
-
-// // // // // // //   // Function to request location permissions
-// // // // // // //   Future<bool> _checkAndRequestPermissions() async {
-// // // // // // //     bool serviceEnabled;
-// // // // // // //     LocationPermission permission;
-
-// // // // // // //     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-// // // // // // //     if (!serviceEnabled) {
-// // // // // // //       // Show a message and return false if location services are not enabled
-// // // // // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // // // // //         SnackBar(content: Text("Please enable location services.")),
-// // // // // // //       );
-// // // // // // //       return false;
-// // // // // // //     }
-
-// // // // // // //     permission = await Geolocator.checkPermission();
-// // // // // // //     if (permission == LocationPermission.denied) {
-// // // // // // //       permission = await Geolocator.requestPermission();
-// // // // // // //       if (permission == LocationPermission.denied) {
-// // // // // // //         // Show a message and return false if permission is denied
-// // // // // // //         ScaffoldMessenger.of(context).showSnackBar(
-// // // // // // //           SnackBar(content: Text("Location permission denied.")),
-// // // // // // //         );
-// // // // // // //         return false;
-// // // // // // //       }
-// // // // // // //     }
-
-// // // // // // //     if (permission == LocationPermission.deniedForever) {
-// // // // // // //       // Show a message and return false if permission is denied forever
-// // // // // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // // // // //         SnackBar(content: Text("Location permission permanently denied.")),
-// // // // // // //       );
-// // // // // // //       return false;
-// // // // // // //     }
-
-// // // // // // //     return true;
-// // // // // // //   }
-
-// // // // // // //   // Fetch current location
-// // // // // // //   Future<void> _getCurrentLocation() async {
-// // // // // // //     bool hasPermission = await _checkAndRequestPermissions();
-// // // // // // //     if (!hasPermission) return;
-
-// // // // // // //     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-// // // // // // //     setState(() {
-// // // // // // //       _currentPosition = position;
-// // // // // // //       _markers.add(Marker(
-// // // // // // //         markerId: MarkerId('currentLocation'),
-// // // // // // //         position: LatLng(position.latitude, position.longitude),
-// // // // // // //         infoWindow: InfoWindow(title: 'Current Location'),
-// // // // // // //       ));
-// // // // // // //     });
-// // // // // // //     mapController.animateCamera(CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)));
-// // // // // // //   }
-
-// // // // // // //   // Function to handle task start (from ProjectDetailedPage)
-// // // // // // //   void startTask() {
-// // // // // // //     setState(() {
-// // // // // // //       isTaskStarted = !isTaskStarted; // Toggle task state
-// // // // // // //       if (isTaskStarted) {
-// // // // // // //         taskStatus = "In Progress"; // Change status when task is started
-// // // // // // //         _getCurrentLocation(); // Start fetching location
-// // // // // // //       } else {
-// // // // // // //         taskStatus = "Todo"; // Reset status when task is stopped
-// // // // // // //       }
-// // // // // // //     });
-// // // // // // //     // Optionally show a message indicating task has started or stopped
-// // // // // // //     ScaffoldMessenger.of(context).showSnackBar(
-// // // // // // //       SnackBar(
-// // // // // // //         content: Text(isTaskStarted ? 'Task Started' : 'Task Stopped'),
-// // // // // // //         backgroundColor: isTaskStarted ? Colors.green : Colors.red,
-// // // // // // //       ),
-// // // // // // //     );
-// // // // // // //   }
-
-// // // // // // //   @override
-// // // // // // //   Widget build(BuildContext context) {
-// // // // // // //     return Scaffold(
-// // // // // // //       appBar: AppBar(
-// // // // // // //         backgroundColor: Colors.purple,
-// // // // // // //         title: const Text('Task Details', style: TextStyle(color: Colors.white)),
-// // // // // // //         leading: IconButton(
-// // // // // // //           icon: const Icon(Icons.arrow_back_outlined, color: Colors.white),
-// // // // // // //           onPressed: () => Navigator.pop(context),
-// // // // // // //         ),
-// // // // // // //       ),
-// // // // // // //       body: SingleChildScrollView(
-// // // // // // //         padding: const EdgeInsets.all(16.0),
-// // // // // // //         child: Column(
-// // // // // // //           crossAxisAlignment: CrossAxisAlignment.start,
-// // // // // // //           children: [
-// // // // // // //             // Task Details
-// // // // // // //             Card(
-// // // // // // //               shape: RoundedRectangleBorder(
-// // // // // // //                 borderRadius: BorderRadius.circular(12),
-// // // // // // //               ),
-// // // // // // //               elevation: 3,
-// // // // // // //               child: Padding(
-// // // // // // //                 padding: const EdgeInsets.all(16.0),
-// // // // // // //                 child: Column(
-// // // // // // //                   crossAxisAlignment: CrossAxisAlignment.start,
-// // // // // // //                   children: [
-// // // // // // //                     Text(
-// // // // // // //                       "Task ID: ${widget.taskId}",
-// // // // // // //                       style: const TextStyle(fontSize: 16, color: Color.fromARGB(255, 1, 1, 1)),
-// // // // // // //                     ),
-// // // // // // //                     const SizedBox(height: 10),
-// // // // // // //                     Text(
-// // // // // // //                       widget.title,
-// // // // // // //                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-// // // // // // //                     ),
-// // // // // // //                     const SizedBox(height: 10),
-// // // // // // //                     Text(
-// // // // // // //                       widget.description,
-// // // // // // //                       style: const TextStyle(fontSize: 16),
-// // // // // // //                     ),
-// // // // // // //                   ],
-// // // // // // //                 ),
-// // // // // // //               ),
-// // // // // // //             ),
-
-// // // // // // //             const SizedBox(height: 20),
-
-// // // // // // //             // Start/Stop Task Button
-// // // // // // //             ElevatedButton(
-// // // // // // //               onPressed: startTask,  // Call startTask function here
-// // // // // // //               style: ElevatedButton.styleFrom(
-// // // // // // //                 backgroundColor: isTaskStarted ? Colors.red : Colors.purple,
-// // // // // // //                 shape: RoundedRectangleBorder(
-// // // // // // //                   borderRadius: BorderRadius.circular(8),
-// // // // // // //                 ),
-// // // // // // //               ),
-// // // // // // //               child: Text(
-// // // // // // //                 isTaskStarted ? 'Stop Task' : 'Start Task',
-// // // // // // //                 style: const TextStyle(color: Colors.white),
-// // // // // // //               ),
-// // // // // // //             ),
-
-// // // // // // //             const SizedBox(height: 20),
-
-// // // // // // //             // Update Task Status
-// // // // // // //             Text(
-// // // // // // //               "Update Task Status",
-// // // // // // //               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // // // //             ),
-// // // // // // //             const SizedBox(height: 10),
-// // // // // // //             DropdownButtonFormField<String>(
-// // // // // // //               value: taskStatus,
-// // // // // // //               items: ["Todo", "In Progress", "Completed"]
-// // // // // // //                   .map((status) => DropdownMenuItem(
-// // // // // // //                         value: status,
-// // // // // // //                         child: Text(status),
-// // // // // // //                       ))
-// // // // // // //                   .toList(),
-// // // // // // //               onChanged: (value) {
-// // // // // // //                 setState(() {
-// // // // // // //                   taskStatus = value!;
-// // // // // // //                 });
-// // // // // // //               },
-// // // // // // //               decoration: InputDecoration(
-// // // // // // //                 border: OutlineInputBorder(
-// // // // // // //                   borderRadius: BorderRadius.circular(8),
-// // // // // // //                 ),
-// // // // // // //                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-// // // // // // //               ),
-// // // // // // //             ),
-
-// // // // // // //             const SizedBox(height: 20),
-
-// // // // // // //             // Add Comments
-// // // // // // //             Text(
-// // // // // // //               "Add Comment",
-// // // // // // //               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // // // //             ),
-// // // // // // //             const SizedBox(height: 10),
-// // // // // // //             TextField(
-// // // // // // //               controller: _commentController,
-// // // // // // //               maxLines: 3,
-// // // // // // //               decoration: InputDecoration(
-// // // // // // //                 hintText: "Write your comment here...",
-// // // // // // //                 border: OutlineInputBorder(
-// // // // // // //                   borderRadius: BorderRadius.circular(8),
-// // // // // // //                 ),
-// // // // // // //               ),
-// // // // // // //             ),
-// // // // // // //             const SizedBox(height: 10),
-// // // // // // //             ElevatedButton(
-// // // // // // //               onPressed: () {
-// // // // // // //                 if (_commentController.text.isNotEmpty) {
-// // // // // // //                   setState(() {
-// // // // // // //                     comments.add(_commentController.text);
-// // // // // // //                     _commentController.clear();
-// // // // // // //                   });
-// // // // // // //                 }
-// // // // // // //               },
-// // // // // // //               style: ElevatedButton.styleFrom(
-// // // // // // //                 backgroundColor: Colors.purple,
-// // // // // // //                 shape: RoundedRectangleBorder(
-// // // // // // //                   borderRadius: BorderRadius.circular(8),
-// // // // // // //                 ),
-// // // // // // //               ),
-// // // // // // //               child: const Text("Add Comment", style: TextStyle(color: Colors.white)),
-// // // // // // //             ),
-
-// // // // // // //             const SizedBox(height: 20),
-
-// // // // // // //             // Display Comments
-// // // // // // //             if (comments.isNotEmpty)
-// // // // // // //               Column(
-// // // // // // //                 crossAxisAlignment: CrossAxisAlignment.start,
-// // // // // // //                 children: [
-// // // // // // //                   Text(
-// // // // // // //                     "Comments",
-// // // // // // //                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // // // //                   ),
-// // // // // // //                   const SizedBox(height: 10),
-// // // // // // //                   ...comments.map((comment) => Padding(
-// // // // // // //                         padding: const EdgeInsets.symmetric(vertical: 4.0),
-// // // // // // //                         child: Card(
-// // // // // // //                           shape: RoundedRectangleBorder(
-// // // // // // //                             borderRadius: BorderRadius.circular(8),
-// // // // // // //                           ),
-// // // // // // //                           elevation: 2,
-// // // // // // //                           child: Padding(
-// // // // // // //                             padding: const EdgeInsets.all(12.0),
-// // // // // // //                             child: Text(comment),
-// // // // // // //                           ),
-// // // // // // //                         ),
-// // // // // // //                       )),
-// // // // // // //                 ],
-// // // // // // //               ),
-
-// // // // // // //             const SizedBox(height: 20),
-
-// // // // // // //             // GPS Tracking Section
-// // // // // // //             if (isTaskStarted)
-// // // // // // //               Column(
-// // // // // // //                 children: [
-// // // // // // //                   Text(
-// // // // // // //                     'GPS Tracking: Active',
-// // // // // // //                     style: TextStyle(color: Colors.green, fontSize: 18),
-// // // // // // //                   ),
-// // // // // // //                   const SizedBox(height: 20),
-// // // // // // //                   Container(
-// // // // // // //                     height: 250,
-// // // // // // //                     child: GoogleMap(
-// // // // // // //                       onMapCreated: (GoogleMapController controller) {
-// // // // // // //                         mapController = controller;
-// // // // // // //                       },
-// // // // // // //                       initialCameraPosition: CameraPosition(
-// // // // // // //                         target: _currentPosition != null
-// // // // // // //                             ? LatLng(_currentPosition!.latitude, _currentPosition!.longitude)
-// // // // // // //                             : LatLng(0.0, 0.0), // Set to a fallback position if no location is available
-// // // // // // //                         zoom: 15,
-// // // // // // //                       ),
-// // // // // // //                       markers: _markers,
-// // // // // // //                     ),
-// // // // // // //                   ),
-// // // // // // //                 ],
-// // // // // // //               ),
-// // // // // // //           ],
-// // // // // // //         ),
-// // // // // // //       ),
-// // // // // // //     );
-// // // // // // //   }
-// // // // // // // }
-
-
-
-
-// // // // // // import 'package:flutter/material.dart';
-// // // // // // import 'package:google_maps_flutter/google_maps_flutter.dart';
-// // // // // // import 'package:geolocator/geolocator.dart';
-// // // // // // import 'package:geocoding/geocoding.dart';
-// // // // // // import 'package:intl/intl.dart';
-
-// // // // // // class ShowTaskPage extends StatefulWidget {
-// // // // // //   final String taskId;
-// // // // // //   final String title;
-// // // // // //   final String description;
-
-// // // // // //   const ShowTaskPage({
-// // // // // //     Key? key,
-// // // // // //     required this.taskId,
-// // // // // //     required this.title,
-// // // // // //     required this.description,
-// // // // // //   }) : super(key: key);
-
-// // // // // //   @override
-// // // // // //   State<ShowTaskPage> createState() => _ShowTaskPageState();
-// // // // // // }
-
-// // // // // // class _ShowTaskPageState extends State<ShowTaskPage> {
-// // // // // //   bool isTaskStarted = false;
-// // // // // //   String taskStartTime = '';
-// // // // // //   String currentLocation = '';
-// // // // // //   String locationName = ''; 
-// // // // // //   String taskStatus = 'To Do';
-// // // // // //   String comment = '';
-// // // // // //   Position? _currentPosition;
-// // // // // //   late GoogleMapController mapController;
-// // // // // //   Set<Marker> _markers = {};
-
-// // // // // //   // Method to request location permissions and fetch location
-// // // // // //   Future<void> _getCurrentLocation() async {
-// // // // // //     bool serviceEnabled;
-// // // // // //     LocationPermission permission;
-
-// // // // // //     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-// // // // // //     if (!serviceEnabled) {
-// // // // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // // // //         const SnackBar(content: Text("Please enable location services.")),
-// // // // // //       );
-// // // // // //       return;
-// // // // // //     }
-
-// // // // // //     permission = await Geolocator.checkPermission();
-// // // // // //     if (permission == LocationPermission.denied) {
-// // // // // //       permission = await Geolocator.requestPermission();
-// // // // // //       if (permission == LocationPermission.denied) {
-// // // // // //         ScaffoldMessenger.of(context).showSnackBar(
-// // // // // //           const SnackBar(content: Text("Location permission denied.")),
-// // // // // //         );
-// // // // // //         return;
-// // // // // //       }
-// // // // // //     }
-
-// // // // // //     if (permission == LocationPermission.deniedForever) {
-// // // // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // // // //         const SnackBar(content: Text("Location permission permanently denied.")),
-// // // // // //       );
-// // // // // //       return;
-// // // // // //     }
-
-// // // // // //     Position position = await Geolocator.getCurrentPosition(
-// // // // // //         desiredAccuracy: LocationAccuracy.high);
-
-// // // // // //     setState(() {
-// // // // // //       _currentPosition = position;
-// // // // // //       currentLocation =
-// // // // // //           'Lat: ${position.latitude}, Lng: ${position.longitude}';
-// // // // // //     });
-
-// // // // // //     // Reverse geocode to get location name
-// // // // // //     _getAddressFromLatLng(position.latitude, position.longitude);
-
-// // // // // //     // Update the map
-// // // // // //     _markers.add(
-// // // // // //       Marker(
-// // // // // //         markerId: const MarkerId('currentLocation'),
-// // // // // //         position: LatLng(position.latitude, position.longitude),
-// // // // // //         infoWindow: const InfoWindow(title: 'Current Location'),
-// // // // // //       ),
-// // // // // //     );
-// // // // // //     mapController.animateCamera(
-// // // // // //       CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
-// // // // // //     );
-// // // // // //   }
-
-// // // // // //   // Method to get address from latitude and longitude
-// // // // // //   Future<void> _getAddressFromLatLng(double lat, double lng) async {
-// // // // // //     try {
-// // // // // //       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-// // // // // //       Placemark place = placemarks.first;
-
-// // // // // //       setState(() {
-// // // // // //         locationName =
-// // // // // //             "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-// // // // // //       });
-// // // // // //     } catch (e) {
-// // // // // //       setState(() {
-// // // // // //         locationName = "Unable to fetch location name";
-// // // // // //       });
-// // // // // //     }
-// // // // // //   }
-
-// // // // // //   // Start or Stop Task
-// // // // // //   void _startStopTask() {
-// // // // // //     if (!isTaskStarted) {
-// // // // // //       setState(() {
-// // // // // //         isTaskStarted = true;
-// // // // // //         taskStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-// // // // // //       });
-// // // // // //       _getCurrentLocation();
-// // // // // //     } else {
-// // // // // //       setState(() {
-// // // // // //         isTaskStarted = false;
-// // // // // //         taskStartTime = '';
-// // // // // //         currentLocation = '';
-// // // // // //         locationName = '';
-// // // // // //       });
-// // // // // //     }
-// // // // // //   }
-
-// // // // // //   @override
-// // // // // //   Widget build(BuildContext context) {
-// // // // // //     return Scaffold(
-// // // // // //       appBar: AppBar(
-// // // // // //         backgroundColor: Colors.purple,
-// // // // // //         title: Text(
-// // // // // //            widget.title,
-// // // // // //           style: const TextStyle(color: Colors.white),
-// // // // // //         ),
-// // // // // //       ),
-// // // // // //       body: SingleChildScrollView(
-// // // // // //         padding: const EdgeInsets.all(16.0),
-// // // // // //         child: Column(
-// // // // // //           crossAxisAlignment: CrossAxisAlignment.start,
-// // // // // //           children: [
-// // // // // //             // Task Details Card
-// // // // // //             Card(
-// // // // // //               shape: RoundedRectangleBorder(
-// // // // // //                 borderRadius: BorderRadius.circular(12),
-// // // // // //               ),
-// // // // // //               elevation: 3,
-// // // // // //               child: Padding(
-// // // // // //                 padding: const EdgeInsets.all(16.0),
-// // // // // //                 child: Column(
-// // // // // //                   crossAxisAlignment: CrossAxisAlignment.start,
-// // // // // //                   children: [
-// // // // // //                     Text(
-// // // // // //                       "Task ID: ${widget.taskId}",
-// // // // // //                       style: const TextStyle(fontSize: 16),
-// // // // // //                     ),
-// // // // // //                     const SizedBox(height: 10),
-// // // // // //                     Text(
-// // // // // //                       widget.title,
-// // // // // //                       style: const TextStyle(
-// // // // // //                           fontSize: 20, fontWeight: FontWeight.bold),
-// // // // // //                     ),
-// // // // // //                     const SizedBox(height: 10),
-// // // // // //                     Text(
-// // // // // //                       widget.description,
-// // // // // //                       style: const TextStyle(fontSize: 16),
-// // // // // //                     ),
-// // // // // //                   ],
-// // // // // //                 ),
-// // // // // //               ),
-// // // // // //             ),
-// // // // // //             const SizedBox(height: 20),
-
-// // // // // //             // Start/Stop Button
-// // // // // //             ElevatedButton(
-// // // // // //               onPressed: _startStopTask,
-// // // // // //               style: ElevatedButton.styleFrom(
-// // // // // //                 backgroundColor: isTaskStarted ? Colors.red : Colors.purple,
-// // // // // //                 shape: RoundedRectangleBorder(
-// // // // // //                   borderRadius: BorderRadius.circular(8),
-// // // // // //                 ),
-// // // // // //               ),
-// // // // // //               child: Text(
-// // // // // //                 isTaskStarted ? 'Stop Task' : 'Start Task',
-// // // // // //                 style: const TextStyle(color: Colors.white),
-// // // // // //               ),
-// // // // // //             ),
-// // // // // //             // const SizedBox(height: 20),
-
-// // // // // //             // // Status Section
-// // // // // //             // const Text(
-// // // // // //             //   'Status',
-// // // // // //             //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // // //             // ),
-// // // // // //             // const SizedBox(height: 10),
-// // // // // //             // Row(
-// // // // // //             //   children: [
-// // // // // //             //     const SizedBox(width: 10),
-// // // // // //             //     Expanded(
-// // // // // //             //       child: DropdownButtonFormField<String>(
-// // // // // //             //         value: taskStatus,
-// // // // // //             //         items: ['To Do', 'In Progress', 'Completed']
-// // // // // //             //             .map((status) => DropdownMenuItem(
-// // // // // //             //                   value: status,
-// // // // // //             //                   child: Text(status),
-// // // // // //             //                 ))
-// // // // // //             //             .toList(),
-// // // // // //             //         onChanged: (value) {
-// // // // // //             //           setState(() {
-// // // // // //             //             taskStatus = value!;
-// // // // // //             //           });
-// // // // // //             //         },
-// // // // // //             //         decoration: InputDecoration(
-// // // // // //             //           border: OutlineInputBorder(
-// // // // // //             //             borderRadius: BorderRadius.circular(8),
-// // // // // //             //           ),
-// // // // // //             //         ),
-// // // // // //             //       ),
-// // // // // //             //     ),
-// // // // // //             //   ],
-// // // // // //             // ),
-// // // // // //             // const SizedBox(height: 20),
-
-// // // // // //             // // Add Comments Section
-// // // // // //             // const Text(
-// // // // // //             //   'Add Comments',
-// // // // // //             //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // // //             // ),
-// // // // // //             // const SizedBox(height: 10),
-// // // // // //             // TextField(
-// // // // // //             //   maxLines: 3,
-// // // // // //             //   decoration: InputDecoration(
-// // // // // //             //     hintText: 'Enter your comments here',
-// // // // // //             //     border: OutlineInputBorder(
-// // // // // //             //       borderRadius: BorderRadius.circular(12),
-// // // // // //             //     ),
-// // // // // //             //   ),
-// // // // // //             //   onChanged: (value) {
-// // // // // //             //     setState(() {
-// // // // // //             //       comment = value;
-// // // // // //             //     });
-// // // // // //             //   },
-// // // // // //             // ),
-            
-
-// // // // // //             const SizedBox(height: 20),
-
-// // // // // //             // Display Start Time and GPS Data
-// // // // // //             if (isTaskStarted) ...[
-// // // // // //               Text(
-// // // // // //                 "Task Started At: $taskStartTime",
-// // // // // //                 style: const TextStyle(fontSize: 16, color: Colors.green),
-// // // // // //               ),
-// // // // // //               const SizedBox(height: 10),
-// // // // // //               Row(
-// // // // // //                 children: [
-// // // // // //                   const Icon(Icons.location_pin, color: Colors.purple),
-// // // // // //                   const SizedBox(width: 5),
-// // // // // //                   Expanded(
-// // // // // //                     child: Text(
-// // // // // //                       locationName.isNotEmpty
-// // // // // //                           ? locationName
-// // // // // //                           : 'Fetching location...',
-// // // // // //                       style: TextStyle(
-// // // // // //                         fontSize: 14,
-// // // // // //                         color: Colors.grey[700],
-// // // // // //                       ),
-// // // // // //                       overflow: TextOverflow.ellipsis,
-// // // // // //                     ),
-// // // // // //                   ),
-// // // // // //                 ],
-// // // // // //               ),
-// // // // // //               const SizedBox(height: 20),
-// // // // // //               // Google Map
-// // // // // //               Container(
-// // // // // //                 height: 200,
-// // // // // //                 decoration: BoxDecoration(
-// // // // // //                   borderRadius: BorderRadius.circular(12),
-// // // // // //                   border: Border.all(color: Colors.grey[300]!),
-// // // // // //                 ),
-// // // // // //                 child: ClipRRect(
-// // // // // //                   borderRadius: BorderRadius.circular(12),
-// // // // // //                   child: GoogleMap(
-// // // // // //                     onMapCreated: (GoogleMapController controller) {
-// // // // // //                       mapController = controller;
-// // // // // //                     },
-// // // // // //                     initialCameraPosition: CameraPosition(
-// // // // // //                       target: _currentPosition != null
-// // // // // //                           ? LatLng(
-// // // // // //                               _currentPosition!.latitude,
-// // // // // //                               _currentPosition!.longitude,
-// // // // // //                             )
-// // // // // //                           : const LatLng(0.0, 0.0),
-// // // // // //                       zoom: 15,
-// // // // // //                     ),
-// // // // // //                     markers: _markers,
-// // // // // //                     myLocationEnabled: true,
-// // // // // //                     zoomControlsEnabled: false,
-// // // // // //                   ),
-// // // // // //                 ),
-// // // // // //               ),
-// // // // // //             ],
-// // // // // //              const SizedBox(height: 20),
-
-// // // // // //             // Status Section
-// // // // // //             const Text(
-// // // // // //               'Status',
-// // // // // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // // //             ),
-// // // // // //             const SizedBox(height: 10),
-// // // // // //             Row(
-// // // // // //               children: [
-// // // // // //                 const SizedBox(width: 10),
-// // // // // //                 Expanded(
-// // // // // //                   child: DropdownButtonFormField<String>(
-// // // // // //                     value: taskStatus,
-// // // // // //                     items: ['To Do', 'In Progress', 'Completed']
-// // // // // //                         .map((status) => DropdownMenuItem(
-// // // // // //                               value: status,
-// // // // // //                               child: Text(status),
-// // // // // //                             ))
-// // // // // //                         .toList(),
-// // // // // //                     onChanged: (value) {
-// // // // // //                       setState(() {
-// // // // // //                         taskStatus = value!;
-// // // // // //                       });
-// // // // // //                     },
-// // // // // //                     decoration: InputDecoration(
-// // // // // //                       border: OutlineInputBorder(
-// // // // // //                         borderRadius: BorderRadius.circular(8),
-// // // // // //                       ),
-// // // // // //                     ),
-// // // // // //                   ),
-// // // // // //                 ),
-// // // // // //               ],
-// // // // // //             ),
-// // // // // //             const SizedBox(height: 20),
-
-// // // // // //             // Add Comments Section
-// // // // // //             const Text(
-// // // // // //               'Add Comments',
-// // // // // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // // //             ),
-// // // // // //             const SizedBox(height: 10),
-// // // // // //             TextField(
-// // // // // //               maxLines: 3,
-// // // // // //               decoration: InputDecoration(
-// // // // // //                 hintText: 'Enter your comments here',
-// // // // // //                 border: OutlineInputBorder(
-// // // // // //                   borderRadius: BorderRadius.circular(12),
-// // // // // //                 ),
-// // // // // //               ),
-// // // // // //               onChanged: (value) {
-// // // // // //                 setState(() {
-// // // // // //                   comment = value;
-// // // // // //                 });
-// // // // // //               },
-// // // // // //             ),
-// // // // // //           ],
-          
-// // // // // //         ),
-// // // // // //       ),
-// // // // // //     );
-// // // // // //   }
-// // // // // // }
-
-
-// // // // // import 'package:flutter/material.dart';
-// // // // // import 'package:google_maps_flutter/google_maps_flutter.dart';
-// // // // // import 'package:geolocator/geolocator.dart';
-// // // // // import 'package:geocoding/geocoding.dart';
-// // // // // import 'package:intl/intl.dart';
-// // // // // import 'dart:async';
-
-// // // // // class ShowTaskPage extends StatefulWidget {
-// // // // //   final String taskId;
-// // // // //   final String title;
-// // // // //   final String description;
-
-// // // // //   const ShowTaskPage({
-// // // // //     Key? key,
-// // // // //     required this.taskId,
-// // // // //     required this.title,
-// // // // //     required this.description,
-// // // // //   }) : super(key: key);
-
-// // // // //   @override
-// // // // //   State<ShowTaskPage> createState() => _ShowTaskPageState();
-// // // // // }
-
-// // // // // class _ShowTaskPageState extends State<ShowTaskPage> {
-// // // // //   bool isTaskStarted = false;
-// // // // //   String taskStartTime = '';
-// // // // //   String currentLocation = '';
-// // // // //   String locationName = '';
-// // // // //   String taskStatus = 'To Do';
-// // // // //   String comment = '';
-// // // // //   Position? _currentPosition;
-// // // // //   late GoogleMapController mapController;
-// // // // //   Set<Marker> _markers = {};
-
-// // // // //   // Timer-related variables
-// // // // //   Timer? _timer;
-// // // // //   Duration _elapsedTime = Duration.zero;
-
-// // // // //   // Method to request location permissions and fetch location
-// // // // //   Future<void> _getCurrentLocation() async {
-// // // // //     bool serviceEnabled;
-// // // // //     LocationPermission permission;
-
-// // // // //     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-// // // // //     if (!serviceEnabled) {
-// // // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // // //         const SnackBar(content: Text("Please enable location services.")),
-// // // // //       );
-// // // // //       return;
-// // // // //     }
-
-// // // // //     permission = await Geolocator.checkPermission();
-// // // // //     if (permission == LocationPermission.denied) {
-// // // // //       permission = await Geolocator.requestPermission();
-// // // // //       if (permission == LocationPermission.denied) {
-// // // // //         ScaffoldMessenger.of(context).showSnackBar(
-// // // // //           const SnackBar(content: Text("Location permission denied.")),
-// // // // //         );
-// // // // //         return;
-// // // // //       }
-// // // // //     }
-
-// // // // //     if (permission == LocationPermission.deniedForever) {
-// // // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // // //         const SnackBar(content: Text("Location permission permanently denied.")),
-// // // // //       );
-// // // // //       return;
-// // // // //     }
-
-// // // // //     Position position = await Geolocator.getCurrentPosition(
-// // // // //         desiredAccuracy: LocationAccuracy.high);
-
-// // // // //     setState(() {
-// // // // //       _currentPosition = position;
-// // // // //       currentLocation =
-// // // // //           'Lat: ${position.latitude}, Lng: ${position.longitude}';
-// // // // //     });
-
-// // // // //     // Reverse geocode to get location name
-// // // // //     _getAddressFromLatLng(position.latitude, position.longitude);
-
-// // // // //     // Update the map
-// // // // //     _markers.add(
-// // // // //       Marker(
-// // // // //         markerId: const MarkerId('currentLocation'),
-// // // // //         position: LatLng(position.latitude, position.longitude),
-// // // // //         infoWindow: const InfoWindow(title: 'Current Location'),
-// // // // //       ),
-// // // // //     );
-// // // // //     mapController.animateCamera(
-// // // // //       CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
-// // // // //     );
-// // // // //   }
-
-// // // // //   // Method to get address from latitude and longitude
-// // // // //   Future<void> _getAddressFromLatLng(double lat, double lng) async {
-// // // // //     try {
-// // // // //       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-// // // // //       Placemark place = placemarks.first;
-
-// // // // //       setState(() {
-// // // // //         locationName =
-// // // // //             "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-// // // // //       });
-// // // // //     } catch (e) {
-// // // // //       setState(() {
-// // // // //         locationName = "Unable to fetch location name";
-// // // // //       });
-// // // // //     }
-// // // // //   }
-
-// // // // //   // Timer methods
-// // // // //   void _startTimer() {
-// // // // //     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-// // // // //       setState(() {
-// // // // //         _elapsedTime += const Duration(seconds: 1);
-// // // // //       });
-// // // // //     });
-// // // // //   }
-
-// // // // //   void _stopTimer() {
-// // // // //     _timer?.cancel();
-// // // // //     _timer = null;
-// // // // //   }
-
-// // // // //   // Start or Stop Task
-// // // // //   void _startStopTask() {
-// // // // //     if (!isTaskStarted) {
-// // // // //       setState(() {
-// // // // //         isTaskStarted = true;
-// // // // //         taskStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-// // // // //         _elapsedTime = Duration.zero;
-// // // // //       });
-
-// // // // //       // Start the timer and fetch location
-// // // // //       _startTimer();
-// // // // //       _getCurrentLocation();
-// // // // //     } else {
-// // // // //       setState(() {
-// // // // //         isTaskStarted = false;
-// // // // //         taskStartTime = '';
-// // // // //         currentLocation = '';
-// // // // //         locationName = '';
-// // // // //       });
-
-// // // // //       // Stop the timer
-// // // // //       _stopTimer();
-// // // // //     }
-// // // // //   }
-
-// // // // //   @override
-// // // // //   void dispose() {
-// // // // //     _stopTimer();
-// // // // //     super.dispose();
-// // // // //   }
-
-// // // // //   @override
-// // // // //   Widget build(BuildContext context) {
-// // // // //     return Scaffold(
-// // // // //       appBar: AppBar(
-// // // // //         backgroundColor: Colors.purple,
-// // // // //         title: Text(
-// // // // //           widget.title,
-// // // // //           style: const TextStyle(color: Colors.white),
-// // // // //         ),
-// // // // //       ),
-// // // // //       body: SingleChildScrollView(
-// // // // //         padding: const EdgeInsets.all(16.0),
-// // // // //         child: Column(
-// // // // //           crossAxisAlignment: CrossAxisAlignment.start,
-// // // // //           children: [
-// // // // //             // Task Details Card
-// // // // //             Card(
-// // // // //               shape: RoundedRectangleBorder(
-// // // // //                 borderRadius: BorderRadius.circular(12),
-// // // // //               ),
-// // // // //               elevation: 3,
-// // // // //               child: Padding(
-// // // // //                 padding: const EdgeInsets.all(16.0),
-// // // // //                 child: Column(
-// // // // //                   crossAxisAlignment: CrossAxisAlignment.start,
-// // // // //                   children: [
-// // // // //                     Text(
-// // // // //                       "Task ID: ${widget.taskId}",
-// // // // //                       style: const TextStyle(fontSize: 16),
-// // // // //                     ),
-// // // // //                     const SizedBox(height: 10),
-// // // // //                     Text(
-// // // // //                       widget.title,
-// // // // //                       style: const TextStyle(
-// // // // //                           fontSize: 20, fontWeight: FontWeight.bold),
-// // // // //                     ),
-// // // // //                     const SizedBox(height: 10),
-// // // // //                     Text(
-// // // // //                       widget.description,
-// // // // //                       style: const TextStyle(fontSize: 16),
-// // // // //                     ),
-// // // // //                   ],
-// // // // //                 ),
-// // // // //               ),
-// // // // //             ),
-// // // // //             const SizedBox(height: 20),
-
-// // // // //             // Start/Stop Button
-// // // // //             ElevatedButton(
-// // // // //               onPressed: _startStopTask,
-// // // // //               style: ElevatedButton.styleFrom(
-// // // // //                 backgroundColor: isTaskStarted ? Colors.red : Colors.purple,
-// // // // //                 shape: RoundedRectangleBorder(
-// // // // //                   borderRadius: BorderRadius.circular(8),
-// // // // //                 ),
-// // // // //               ),
-// // // // //               child: Text(
-// // // // //                 isTaskStarted ? 'Stop Task' : 'Start Task',
-// // // // //                 style: const TextStyle(color: Colors.white),
-// // // // //               ),
-// // // // //             ),
-// // // // //             const SizedBox(height: 20),
-
-// // // // //             // Status Section
-// // // // //             const Text(
-// // // // //               'Status',
-// // // // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // //             ),
-// // // // //             const SizedBox(height: 10),
-// // // // //             Row(
-// // // // //               children: [
-// // // // //                 const SizedBox(width: 10),
-// // // // //                 Expanded(
-// // // // //                   child: DropdownButtonFormField<String>(
-// // // // //                     value: taskStatus,
-// // // // //                     items: ['To Do', 'In Progress', 'Completed']
-// // // // //                         .map((status) => DropdownMenuItem(
-// // // // //                               value: status,
-// // // // //                               child: Text(status),
-// // // // //                             ))
-// // // // //                         .toList(),
-// // // // //                     onChanged: (value) {
-// // // // //                       setState(() {
-// // // // //                         taskStatus = value!;
-// // // // //                       });
-// // // // //                     },
-// // // // //                     decoration: InputDecoration(
-// // // // //                       border: OutlineInputBorder(
-// // // // //                         borderRadius: BorderRadius.circular(8),
-// // // // //                       ),
-// // // // //                     ),
-// // // // //                   ),
-// // // // //                 ),
-// // // // //               ],
-// // // // //             ),
-// // // // //             const SizedBox(height: 20),
-
-// // // // //             // Add Comments Section
-// // // // //             const Text(
-// // // // //               'Add Comments',
-// // // // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // // //             ),
-// // // // //             const SizedBox(height: 10),
-// // // // //             TextField(
-// // // // //               maxLines: 3,
-// // // // //               decoration: InputDecoration(
-// // // // //                 hintText: 'Enter your comments here',
-// // // // //                 border: OutlineInputBorder(
-// // // // //                   borderRadius: BorderRadius.circular(12),
-// // // // //                 ),
-// // // // //               ),
-// // // // //               onChanged: (value) {
-// // // // //                 setState(() {
-// // // // //                   comment = value;
-// // // // //                 });
-// // // // //               },
-// // // // //             ),
-              
-            
-            
-            
-// // // // //             const SizedBox(height: 20),
-
-// // // // //             // Display Start Time and Elapsed Time
-// // // // //             if (isTaskStarted) ...[
-// // // // //               Text(
-// // // // //                 "Task Started At: $taskStartTime",
-// // // // //                 style: const TextStyle(fontSize: 16, color: Colors.green),
-// // // // //               ),
-// // // // //               const SizedBox(height: 10),
-// // // // //               Row(
-// // // // //                 children: [
-// // // // //                   const Icon(Icons.access_time, color: Colors.purple),
-// // // // //                   const SizedBox(width: 10),
-// // // // //                   Text(
-// // // // //                     "Elapsed Time: ${_elapsedTime.inHours.toString().padLeft(2, '0')}:${(_elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(_elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}",
-// // // // //                     style: const TextStyle(fontSize: 16, color: Colors.grey),
-// // // // //                   ),
-// // // // //                 ],
-// // // // //               ),
-// // // // //               const SizedBox(height: 20),
-// // // // //               Row(
-// // // // //                 children: [
-// // // // //                   const Icon(Icons.location_pin, color: Colors.purple),
-// // // // //                   const SizedBox(width: 5),
-// // // // //                   Expanded(
-// // // // //                     child: Text(
-// // // // //                       locationName.isNotEmpty
-// // // // //                           ? locationName
-// // // // //                           : 'Fetching location...',
-// // // // //                       style: TextStyle(
-// // // // //                         fontSize: 14,
-// // // // //                         color: Colors.grey[700],
-// // // // //                       ),
-// // // // //                       overflow: TextOverflow.ellipsis,
-// // // // //                     ),
-// // // // //                   ),
-// // // // //                 ],
-// // // // //               ),
-// // // // //               const SizedBox(height: 20),
-// // // // //               // Google Map
-// // // // //               Container(
-// // // // //                 height: 200,
-// // // // //                 decoration: BoxDecoration(
-// // // // //                   borderRadius: BorderRadius.circular(12),
-// // // // //                   border: Border.all(color: Colors.grey[300]!),
-// // // // //                 ),
-// // // // //                 child: ClipRRect(
-// // // // //                   borderRadius: BorderRadius.circular(12),
-// // // // //                   child: GoogleMap(
-// // // // //                     onMapCreated: (GoogleMapController controller) {
-// // // // //                       mapController = controller;
-// // // // //                     },
-// // // // //                     initialCameraPosition: CameraPosition(
-// // // // //                       target: _currentPosition != null
-// // // // //                           ? LatLng(
-// // // // //                               _currentPosition!.latitude,
-// // // // //                               _currentPosition!.longitude,
-// // // // //                             )
-// // // // //                           : const LatLng(0.0, 0.0),
-// // // // //                       zoom: 15,
-// // // // //                     ),
-// // // // //                     markers: _markers,
-// // // // //                     myLocationEnabled: true,
-// // // // //                     zoomControlsEnabled: false,
-// // // // //                   ),
-// // // // //                 ),
-// // // // //               ),
-// // // // //             ] 
-// // // // //           ],
-// // // // //         ),
-// // // // //       ),
-// // // // //     );
-// // // // //   }
-// // // // // }
-
-
-
-
-// // // // import 'package:flutter/material.dart';
-// // // // import 'package:google_maps_flutter/google_maps_flutter.dart';
-// // // // import 'package:geolocator/geolocator.dart';
-// // // // import 'package:geocoding/geocoding.dart';
-// // // // import 'package:intl/intl.dart';
-// // // // import 'dart:async';
-
-// // // // class ShowTaskPage extends StatefulWidget {
-// // // //   final String taskId;
-// // // //   final String title;
-// // // //   final String description;
-
-// // // //   const ShowTaskPage({
-// // // //     Key? key,
-// // // //     required this.taskId,
-// // // //     required this.title,
-// // // //     required this.description,
-// // // //   }) : super(key: key);
-
-// // // //   @override
-// // // //   State<ShowTaskPage> createState() => _ShowTaskPageState();
-// // // // }
-
-// // // // class _ShowTaskPageState extends State<ShowTaskPage> {
-// // // //   bool isTaskStarted = false;
-// // // //   String taskStartTime = '';
-// // // //   String currentLocation = '';
-// // // //   String locationName = '';
-// // // //   String taskStatus = 'To Do';
-// // // //   String comment = '';
-// // // //   Position? _currentPosition;
-// // // //   late GoogleMapController mapController;
-// // // //   Set<Marker> _markers = {};
-
-// // // //   // Timer-related variables
-// // // //   Timer? _timer;
-// // // //   Duration _elapsedTime = Duration.zero;
-
-// // // //   // Method to request location permissions and fetch location
-// // // //   Future<void> _getCurrentLocation() async {
-// // // //     bool serviceEnabled;
-// // // //     LocationPermission permission;
-
-// // // //     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-// // // //     if (!serviceEnabled) {
-// // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // //         const SnackBar(content: Text("Please enable location services.")),
-// // // //       );
-// // // //       return;
-// // // //     }
-
-// // // //     permission = await Geolocator.checkPermission();
-// // // //     if (permission == LocationPermission.denied) {
-// // // //       permission = await Geolocator.requestPermission();
-// // // //       if (permission == LocationPermission.denied) {
-// // // //         ScaffoldMessenger.of(context).showSnackBar(
-// // // //           const SnackBar(content: Text("Location permission denied.")),
-// // // //         );
-// // // //         return;
-// // // //       }
-// // // //     }
-
-// // // //     if (permission == LocationPermission.deniedForever) {
-// // // //       ScaffoldMessenger.of(context).showSnackBar(
-// // // //         const SnackBar(
-// // // //             content: Text("Location permission permanently denied.")),
-// // // //       );
-// // // //       return;
-// // // //     }
-
-// // // //     Position position = await Geolocator.getCurrentPosition(
-// // // //         desiredAccuracy: LocationAccuracy.high);
-
-// // // //     setState(() {
-// // // //       _currentPosition = position;
-// // // //       currentLocation =
-// // // //           'Lat: ${position.latitude}, Lng: ${position.longitude}';
-// // // //     });
-
-// // // //     // Reverse geocode to get location name
-// // // //     _getAddressFromLatLng(position.latitude, position.longitude);
-
-// // // //     // Update the map
-// // // //     _markers.add(
-// // // //       Marker(
-// // // //         markerId: const MarkerId('currentLocation'),
-// // // //         position: LatLng(position.latitude, position.longitude),
-// // // //         infoWindow: const InfoWindow(title: 'Current Location'),
-// // // //       ),
-// // // //     );
-// // // //     mapController.animateCamera(
-// // // //       CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
-// // // //     );
-// // // //   }
-
-// // // //   // Method to get address from latitude and longitude
-// // // //   Future<void> _getAddressFromLatLng(double lat, double lng) async {
-// // // //     try {
-// // // //       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-// // // //       Placemark place = placemarks.first;
-
-// // // //       setState(() {
-// // // //         locationName =
-// // // //             "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-// // // //       });
-// // // //     } catch (e) {
-// // // //       setState(() {
-// // // //         locationName = "Unable to fetch location name";
-// // // //       });
-// // // //     }
-// // // //   }
-
-// // // //   // Timer methods
-// // // //   void _startTimer() {
-// // // //     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-// // // //       setState(() {
-// // // //         _elapsedTime += const Duration(seconds: 1);
-// // // //       });
-// // // //     });
-// // // //   }
-
-// // // //   void _stopTimer() {
-// // // //     _timer?.cancel();
-// // // //     _timer = null;
-// // // //   }
-
-// // // //   // Start or Stop Task
-// // // //   void _startStopTask() {
-// // // //     if (!isTaskStarted) {
-// // // //       setState(() {
-// // // //         isTaskStarted = true;
-// // // //         taskStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-// // // //         _elapsedTime = Duration.zero;
-// // // //       });
-
-// // // //       // Start the timer and fetch location
-// // // //       _startTimer();
-// // // //       _getCurrentLocation();
-// // // //     } else {
-// // // //       setState(() {
-// // // //         isTaskStarted = false;
-// // // //         taskStartTime = '';
-// // // //         currentLocation = '';
-// // // //         locationName = '';
-// // // //       });
-
-// // // //       // Stop the timer
-// // // //       _stopTimer();
-// // // //     }
-// // // //   }
-
-// // // //   @override
-// // // //   void dispose() {
-// // // //     _stopTimer();
-// // // //     super.dispose();
-// // // //   }
-
-// // // //   @override
-// // // //   Widget build(BuildContext context) {
-// // // //     return Scaffold(
-// // // //       appBar: AppBar(
-// // // //         backgroundColor: Colors.purple,
-// // // //         title: Text(
-// // // //           widget.title,
-// // // //           style: const TextStyle(color: Colors.white),
-// // // //         ),
-// // // //       ),
-// // // //       body: SingleChildScrollView(
-// // // //         padding: const EdgeInsets.all(16.0),
-// // // //         child: Column(
-// // // //           crossAxisAlignment: CrossAxisAlignment.start,
-// // // //           children: [
-// // // //             // Task Details Card
-// // // //             Card(
-// // // //               shape: RoundedRectangleBorder(
-// // // //                 borderRadius: BorderRadius.circular(12),
-// // // //               ),
-// // // //               elevation: 3,
-// // // //               child: Padding(
-// // // //                 padding: const EdgeInsets.all(16.0),
-// // // //                 child: Column(
-// // // //                   crossAxisAlignment: CrossAxisAlignment.start,
-// // // //                   children: [
-// // // //                     Text(
-// // // //                       "Task ID: ${widget.taskId}",
-// // // //                       style: const TextStyle(fontSize: 16),
-// // // //                     ),
-// // // //                     const SizedBox(height: 10),
-// // // //                     Text(
-// // // //                       widget.title,
-// // // //                       style: const TextStyle(
-// // // //                           fontSize: 20, fontWeight: FontWeight.bold),
-// // // //                     ),
-// // // //                     const SizedBox(height: 10),
-// // // //                     Text(
-// // // //                       widget.description,
-// // // //                       style: const TextStyle(fontSize: 16),
-// // // //                     ),
-// // // //                   ],
-// // // //                 ),
-// // // //               ),
-// // // //             ),
-// // // //             const SizedBox(height: 20),
-
-// // // //             // Status Section
-// // // //             const Text(
-// // // //               'Status',
-// // // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // //             ),
-// // // //             const SizedBox(height: 10),
-// // // //             DropdownButtonFormField<String>(
-// // // //               value: taskStatus,
-// // // //               items: ['To Do', 'In Progress', 'Completed']
-// // // //                   .map((status) => DropdownMenuItem(
-// // // //                         value: status,
-// // // //                         child: Text(status),
-// // // //                       ))
-// // // //                   .toList(),
-// // // //               onChanged: (value) {
-// // // //                 setState(() {
-// // // //                   taskStatus = value!;
-// // // //                 });
-// // // //               },
-// // // //               decoration: InputDecoration(
-// // // //                 border: OutlineInputBorder(
-// // // //                   borderRadius: BorderRadius.circular(8),
-// // // //                 ),
-// // // //               ),
-// // // //             ),
-// // // //             const SizedBox(height: 20),
-
-// // // //             // Add Comments Section
-// // // //             const Text(
-// // // //               'Add Comments',
-// // // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // // //             ),
-// // // //             const SizedBox(height: 10),
-// // // //             TextField(
-// // // //               maxLines: 3,
-// // // //               decoration: InputDecoration(
-// // // //                 hintText: 'Enter your comments here',
-// // // //                 border: OutlineInputBorder(
-// // // //                   borderRadius: BorderRadius.circular(12),
-// // // //                 ),
-// // // //               ),
-// // // //               onChanged: (value) {
-// // // //                 setState(() {
-// // // //                   comment = value;
-// // // //                 });
-// // // //               },
-// // // //             ),
-// // // //             const SizedBox(height: 20),
-
-// // // //             // Start/Stop Button
-// // // //             ElevatedButton(
-// // // //               onPressed: _startStopTask,
-// // // //               style: ElevatedButton.styleFrom(
-// // // //                 backgroundColor: isTaskStarted ? Colors.red : Colors.purple,
-// // // //                 shape: RoundedRectangleBorder(
-// // // //                   borderRadius: BorderRadius.circular(8),
-// // // //                 ),
-// // // //               ),
-// // // //               child: Text(
-// // // //                 isTaskStarted ? 'Stop Task' : 'Start Task',
-// // // //                 style: const TextStyle(color: Colors.white),
-// // // //               ),
-// // // //             ),
-// // // //             const SizedBox(height: 20),
-
-// // // //             // Conditional Display of Task Details
-// // // //             if (isTaskStarted) ...[
-// // // //               Text(
-// // // //                 "Task Started At: $taskStartTime",
-// // // //                 style: const TextStyle(fontSize: 16, color: Colors.green),
-// // // //               ),
-// // // //               const SizedBox(height: 10),
-// // // //               Row(
-// // // //                 children: [
-// // // //                   const Icon(Icons.access_time, color: Colors.purple),
-// // // //                   const SizedBox(width: 10),
-// // // //                   Text(
-// // // //                     "Elapsed Time: ${_elapsedTime.inHours.toString().padLeft(2, '0')}:${(_elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(_elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}",
-// // // //                     style: const TextStyle(fontSize: 16, color: Colors.grey),
-// // // //                   ),
-// // // //                 ],
-// // // //               ),
-// // // //               const SizedBox(height: 20),
-// // // //               Row(
-// // // //                 children: [
-// // // //                   const Icon(Icons.location_pin, color: Colors.purple),
-// // // //                   const SizedBox(width: 5),
-// // // //                   Expanded(
-// // // //                     child: Text(
-// // // //                       locationName.isNotEmpty
-// // // //                           ? locationName
-// // // //                           : 'Fetching location...',
-// // // //                       style: TextStyle(
-// // // //                         fontSize: 14,
-// // // //                         color: Colors.grey[700],
-// // // //                       ),
-// // // //                       overflow: TextOverflow.ellipsis,
-// // // //                     ),
-// // // //                   ),
-// // // //                 ],
-// // // //               ),
-// // // //               const SizedBox(height: 20),
-
-// // // //               // Google Map Section
-// // // //               Container(
-// // // //                 height: 200,
-// // // //                 decoration: BoxDecoration(
-// // // //                   borderRadius: BorderRadius.circular(12),
-// // // //                   border: Border.all(color: Colors.grey[300]!),
-// // // //                 ),
-// // // //                 child: ClipRRect(
-// // // //                   borderRadius: BorderRadius.circular(12),
-// // // //                   child: GoogleMap(
-// // // //                     onMapCreated: (GoogleMapController controller) {
-// // // //                       mapController = controller;
-// // // //                     },
-// // // //                     initialCameraPosition: CameraPosition(
-// // // //                       target: _currentPosition != null
-// // // //                           ? LatLng(
-// // // //                               _currentPosition!.latitude,
-// // // //                               _currentPosition!.longitude,
-// // // //                             )
-// // // //                           : const LatLng(0.0, 0.0),
-// // // //                       zoom: 15,
-// // // //                     ),
-// // // //                     markers: _markers,
-// // // //                     myLocationEnabled: true,
-// // // //                     zoomControlsEnabled: false,
-// // // //                   ),
-// // // //                 ),
-// // // //               ),
-// // // //             ],
-// // // //           ],
-// // // //         ),
-// // // //       ),
-// // // //     );
-// // // //   }
-// // // // }
-
-
-
-// // // import 'package:flutter/material.dart';
-// // // import 'package:google_maps_flutter/google_maps_flutter.dart';
-// // // import 'package:geolocator/geolocator.dart';
-// // // import 'package:geocoding/geocoding.dart';
-// // // import 'package:intl/intl.dart';
-// // // import 'dart:async';
-
-// // // class ShowTaskPage extends StatefulWidget {
-// // //   final String taskId;
-// // //   final String title;
-// // //   final String description;
-
-// // //   const ShowTaskPage({
-// // //     Key? key,
-// // //     required this.taskId,
-// // //     required this.title,
-// // //     required this.description,
-// // //   }) : super(key: key);
-
-// // //   @override
-// // //   State<ShowTaskPage> createState() => _ShowTaskPageState();
-// // // }
-
-// // // class _ShowTaskPageState extends State<ShowTaskPage> {
-// // //   bool isTaskStarted = false;
-// // //   String taskStartTime = '';
-// // //   String taskStatus = 'To Do';
-// // //   String comment = '';
-// // //   String currentLocation = '';
-// // //   String locationName = '';
-// // //   Position? _currentPosition;
-// // //   late GoogleMapController mapController;
-// // //   Set<Marker> _markers = {};
-
-// // //   // Method to request location permissions and fetch current location
-// // //   Future<void> _getCurrentLocation() async {
-// // //     bool serviceEnabled;
-// // //     LocationPermission permission;
-
-// // //     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-// // //     if (!serviceEnabled) {
-// // //       ScaffoldMessenger.of(context).showSnackBar(
-// // //         const SnackBar(content: Text("Please enable location services.")),
-// // //       );
-// // //       return;
-// // //     }
-
-// // //     permission = await Geolocator.checkPermission();
-// // //     if (permission == LocationPermission.denied) {
-// // //       permission = await Geolocator.requestPermission();
-// // //       if (permission == LocationPermission.denied) {
-// // //         ScaffoldMessenger.of(context).showSnackBar(
-// // //           const SnackBar(content: Text("Location permission denied.")),
-// // //         );
-// // //         return;
-// // //       }
-// // //     }
-
-// // //     if (permission == LocationPermission.deniedForever) {
-// // //       ScaffoldMessenger.of(context).showSnackBar(
-// // //         const SnackBar(content: Text("Location permission permanently denied.")),
-// // //       );
-// // //       return;
-// // //     }
-
-// // //     Position position = await Geolocator.getCurrentPosition(
-// // //         desiredAccuracy: LocationAccuracy.high);
-
-// // //     setState(() {
-// // //       _currentPosition = position;
-// // //       currentLocation =
-// // //           'Lat: ${position.latitude}, Lng: ${position.longitude}';
-// // //     });
-
-// // //     // Reverse geocode to get location name
-// // //     _getAddressFromLatLng(position.latitude, position.longitude);
-
-// // //     // Add marker and update map
-// // //     _markers.add(
-// // //       Marker(
-// // //         markerId: const MarkerId('currentLocation'),
-// // //         position: LatLng(position.latitude, position.longitude),
-// // //         infoWindow: const InfoWindow(title: 'Current Location'),
-// // //       ),
-// // //     );
-// // //     mapController.animateCamera(
-// // //       CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
-// // //     );
-// // //   }
-
-// // //   // Method to get address from latitude and longitude
-// // //   Future<void> _getAddressFromLatLng(double lat, double lng) async {
-// // //     try {
-// // //       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-// // //       Placemark place = placemarks.first;
-
-// // //       setState(() {
-// // //         locationName =
-// // //             "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-// // //       });
-// // //     } catch (e) {
-// // //       setState(() {
-// // //         locationName = "Unable to fetch location name";
-// // //       });
-// // //     }
-// // //   }
-
-// // //   // Start/Stop Task
-// // //   void _startStopTask() {
-// // //     if (!isTaskStarted) {
-// // //       setState(() {
-// // //         isTaskStarted = true;
-// // //         taskStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-// // //       });
-
-// // //       // Fetch location when starting the task
-// // //       _getCurrentLocation();
-// // //     } else {
-// // //       setState(() {
-// // //         isTaskStarted = false;
-// // //         taskStartTime = '';
-// // //         currentLocation = '';
-// // //         locationName = '';
-// // //         _markers.clear(); // Clear the markers on stop
-// // //       });
-// // //     }
-// // //   }
-
-// // //   @override
-// // //   Widget build(BuildContext context) {
-// // //     return Scaffold(
-// // //       appBar: AppBar(
-// // //         backgroundColor: Colors.purple,
-// // //         title: Text(
-// // //           widget.title,
-// // //           style: const TextStyle(color: Colors.white),
-// // //         ),
-// // //       ),
-// // //       body: SingleChildScrollView(
-// // //         padding: const EdgeInsets.all(16.0),
-// // //         child: Column(
-// // //           crossAxisAlignment: CrossAxisAlignment.start,
-// // //           children: [
-// // //             // Task Details Card
-// // //             Card(
-// // //               shape: RoundedRectangleBorder(
-// // //                 borderRadius: BorderRadius.circular(12),
-// // //               ),
-// // //               elevation: 3,
-// // //               child: Padding(
-// // //                 padding: const EdgeInsets.all(16.0),
-// // //                 child: Column(
-// // //                   crossAxisAlignment: CrossAxisAlignment.start,
-// // //                   children: [
-// // //                     Text(
-// // //                       "Task ID: ${widget.taskId}",
-// // //                       style: const TextStyle(fontSize: 16),
-// // //                     ),
-// // //                     const SizedBox(height: 10),
-// // //                     Text(
-// // //                       widget.title,
-// // //                       style: const TextStyle(
-// // //                         fontSize: 20,
-// // //                         fontWeight: FontWeight.bold,
-// // //                       ),
-// // //                     ),
-// // //                     const SizedBox(height: 10),
-// // //                     Text(
-// // //                       widget.description,
-// // //                       style: const TextStyle(fontSize: 16),
-// // //                     ),
-// // //                     const SizedBox(height: 20),
-// // //                     // Start/Stop Task Button inside Task Card
-// // //                     ElevatedButton(
-// // //                       onPressed: _startStopTask,
-// // //                       style: ElevatedButton.styleFrom(
-// // //                         backgroundColor: isTaskStarted ? Colors.red : Colors.purple,
-// // //                         shape: RoundedRectangleBorder(
-// // //                           borderRadius: BorderRadius.circular(8),
-// // //                         ),
-// // //                       ),
-// // //                       child: Text(
-// // //                         isTaskStarted ? 'Stop Task' : 'Start Task',
-// // //                         style: const TextStyle(color: Colors.white),
-// // //                       ),
-// // //                     ),
-// // //                   ],
-// // //                 ),
-// // //               ),
-// // //             ),
-// // //             const SizedBox(height: 20),
-
-// // //             // Status Section
-// // //             const Text(
-// // //               'Status',
-// // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // //             ),
-// // //             const SizedBox(height: 10),
-// // //             DropdownButtonFormField<String>(
-// // //               value: taskStatus,
-// // //               items: ['To Do', 'In Progress', 'Completed']
-// // //                   .map((status) => DropdownMenuItem(
-// // //                         value: status,
-// // //                         child: Text(status),
-// // //                       ))
-// // //                   .toList(),
-// // //               onChanged: (value) {
-// // //                 setState(() {
-// // //                   taskStatus = value!;
-// // //                 });
-// // //               },
-// // //               decoration: InputDecoration(
-// // //                 border: OutlineInputBorder(
-// // //                   borderRadius: BorderRadius.circular(8),
-// // //                 ),
-// // //               ),
-// // //             ),
-// // //             const SizedBox(height: 20),
-
-// // //             // Add Comments Section
-// // //             const Text(
-// // //               'Add Comments',
-// // //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// // //             ),
-// // //             const SizedBox(height: 10),
-// // //             TextField(
-// // //               maxLines: 3,
-// // //               decoration: InputDecoration(
-// // //                 hintText: 'Enter your comments here',
-// // //                 border: OutlineInputBorder(
-// // //                   borderRadius: BorderRadius.circular(12),
-// // //                 ),
-// // //               ),
-// // //               onChanged: (value) {
-// // //                 setState(() {
-// // //                   comment = value;
-// // //                 });
-// // //               },
-// // //             ),
-// // //             const SizedBox(height: 20),
-
-// // //             // Display Start Time, Current Location, and Google Map
-// // //             if (isTaskStarted) ...[
-// // //               Text(
-// // //                 "Task Started At: $taskStartTime",
-// // //                 style: const TextStyle(fontSize: 16, color: Colors.green),
-// // //               ),
-// // //               const SizedBox(height: 10),
-// // //               Row(
-// // //                 children: [
-// // //                   const Icon(Icons.location_pin, color: Colors.purple),
-// // //                   const SizedBox(width: 5),
-// // //                   Expanded(
-// // //                     child: Text(
-// // //                       locationName.isNotEmpty
-// // //                           ? locationName
-// // //                           : 'Fetching location...',
-// // //                       style: TextStyle(
-// // //                         fontSize: 14,
-// // //                         color: Colors.grey[700],
-// // //                       ),
-// // //                       overflow: TextOverflow.ellipsis,
-// // //                     ),
-// // //                   ),
-// // //                 ],
-// // //               ),
-// // //               const SizedBox(height: 20),
-// // //               // Google Map
-// // //               Container(
-// // //                 height: 200,
-// // //                 decoration: BoxDecoration(
-// // //                   borderRadius: BorderRadius.circular(12),
-// // //                   border: Border.all(color: Colors.grey[300]!),
-// // //                 ),
-// // //                 child: ClipRRect(
-// // //                   borderRadius: BorderRadius.circular(12),
-// // //                   child: GoogleMap(
-// // //                     onMapCreated: (GoogleMapController controller) {
-// // //                       mapController = controller;
-// // //                     },
-// // //                     initialCameraPosition: CameraPosition(
-// // //                       target: _currentPosition != null
-// // //                           ? LatLng(
-// // //                               _currentPosition!.latitude,
-// // //                               _currentPosition!.longitude,
-// // //                             )
-// // //                           : const LatLng(0.0, 0.0),
-// // //                       zoom: 15,
-// // //                     ),
-// // //                     markers: _markers,
-// // //                     myLocationEnabled: true,
-// // //                     zoomControlsEnabled: false,
-// // //                   ),
-// // //                 ),
-// // //               ),
-// // //             ]
-// // //           ],
-// // //         ),
-// // //       ),
-// // //     );
-// // //   }
-// // // }
-
-
-// // import 'package:flutter/material.dart';
-// // import 'package:google_maps_flutter/google_maps_flutter.dart';
-// // import 'package:geolocator/geolocator.dart';
-// // import 'package:geocoding/geocoding.dart';
-// // import 'package:intl/intl.dart';
-// // import 'dart:async';
-
-// // class ShowTaskPage extends StatefulWidget {
-// //   final String taskId;
-// //   final String title;
-// //   final String description;
-
-// //   const ShowTaskPage({
-// //     Key? key,
-// //     required this.taskId,
-// //     required this.title,
-// //     required this.description,
-// //   }) : super(key: key);
-
-// //   @override
-// //   State<ShowTaskPage> createState() => _ShowTaskPageState();
-// // }
-
-// // class _ShowTaskPageState extends State<ShowTaskPage> {
-// //   bool isTaskStarted = false;
-// //   String taskStartTime = '';
-// //   String taskStatus = 'To Do';
-// //   String comment = '';
-// //   String currentLocation = '';
-// //   String locationName = '';
-// //   Position? _currentPosition;
-// //   late GoogleMapController mapController;
-// //   Set<Marker> _markers = {};
-  
-// //   // Timer-related variables
-// //   Timer? _timer;
-// //   Duration _elapsedTime = Duration.zero;
-
-// //   // Method to request location permissions and fetch current location
-// //   Future<void> _getCurrentLocation() async {
-// //     bool serviceEnabled;
-// //     LocationPermission permission;
-
-// //     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-// //     if (!serviceEnabled) {
-// //       ScaffoldMessenger.of(context).showSnackBar(
-// //         const SnackBar(content: Text("Please enable location services.")),
-// //       );
-// //       return;
-// //     }
-
-// //     permission = await Geolocator.checkPermission();
-// //     if (permission == LocationPermission.denied) {
-// //       permission = await Geolocator.requestPermission();
-// //       if (permission == LocationPermission.denied) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           const SnackBar(content: Text("Location permission denied.")),
-// //         );
-// //         return;
-// //       }
-// //     }
-
-// //     if (permission == LocationPermission.deniedForever) {
-// //       ScaffoldMessenger.of(context).showSnackBar(
-// //         const SnackBar(content: Text("Location permission permanently denied.")),
-// //       );
-// //       return;
-// //     }
-
-// //     Position position = await Geolocator.getCurrentPosition(
-// //         desiredAccuracy: LocationAccuracy.high);
-
-// //     setState(() {
-// //       _currentPosition = position;
-// //       currentLocation =
-// //           'Lat: ${position.latitude}, Lng: ${position.longitude}';
-// //     });
-
-// //     // Reverse geocode to get location name
-// //     _getAddressFromLatLng(position.latitude, position.longitude);
-
-// //     // Add marker and update map
-// //     _markers.add(
-// //       Marker(
-// //         markerId: const MarkerId('currentLocation'),
-// //         position: LatLng(position.latitude, position.longitude),
-// //         infoWindow: const InfoWindow(title: 'Current Location'),
-// //       ),
-// //     );
-// //     mapController.animateCamera(
-// //       CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
-// //     );
-// //   }
-
-// //   // Method to get address from latitude and longitude
-// //   Future<void> _getAddressFromLatLng(double lat, double lng) async {
-// //     try {
-// //       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-// //       Placemark place = placemarks.first;
-
-// //       setState(() {
-// //         locationName =
-// //             "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-// //       });
-// //     } catch (e) {
-// //       setState(() {
-// //         locationName = "Unable to fetch location name";
-// //       });
-// //     }
-// //   }
-
-// //   // Start/Stop Task
-// //   void _startStopTask() {
-// //     if (!isTaskStarted) {
-// //       setState(() {
-// //         isTaskStarted = true;
-// //         taskStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-// //         _elapsedTime = Duration.zero; // Reset the timer
-// //       });
-
-// //       // Start the timer
-// //       _startTimer();
-// //       // Fetch location when starting the task
-// //       _getCurrentLocation();
-// //     } else {
-// //       setState(() {
-// //         isTaskStarted = false;
-// //         taskStartTime = '';
-// //         currentLocation = '';
-// //         locationName = '';
-// //         _markers.clear(); // Clear the markers on stop
-// //       });
-
-// //       // Stop the timer
-// //       _stopTimer();
-// //     }
-// //   }
-
-// //   // Timer methods
-// //   void _startTimer() {
-// //     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-// //       setState(() {
-// //         _elapsedTime += const Duration(seconds: 1);
-// //       });
-// //     });
-// //   }
-
-// //   void _stopTimer() {
-// //     _timer?.cancel();
-// //     _timer = null;
-// //   }
-
-// //   @override
-// //   void dispose() {
-// //     _stopTimer();
-// //     super.dispose();
-// //   }
-
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: AppBar(
-// //         backgroundColor: Colors.purple,
-// //         title: Text(
-// //           widget.title,
-// //           style: const TextStyle(color: Colors.white),
-// //         ),
-// //       ),
-// //       body: SingleChildScrollView(
-// //         padding: const EdgeInsets.all(16.0),
-// //         child: Column(
-// //           crossAxisAlignment: CrossAxisAlignment.start,
-// //           children: [
-// //             // Task Details Card
-// //             Card(
-// //               shape: RoundedRectangleBorder(
-// //                 borderRadius: BorderRadius.circular(12),
-// //               ),
-// //               elevation: 3,
-// //               child: Padding(
-// //                 padding: const EdgeInsets.all(16.0),
-// //                 child: Column(
-// //                   crossAxisAlignment: CrossAxisAlignment.start,
-// //                   children: [
-// //                     Text(
-// //                       "Task ID: ${widget.taskId}",
-// //                       style: const TextStyle(fontSize: 16),
-// //                     ),
-// //                     const SizedBox(height: 10),
-// //                     Text(
-// //                       widget.title,
-// //                       style: const TextStyle(
-// //                         fontSize: 20,
-// //                         fontWeight: FontWeight.bold,
-// //                       ),
-// //                     ),
-// //                     const SizedBox(height: 10),
-// //                     Text(
-// //                       widget.description,
-// //                       style: const TextStyle(fontSize: 16),
-// //                     ),
-// //                     const SizedBox(height: 20),
-// //                     // Start/Stop Task Button inside Task Card
-// //                     ElevatedButton(
-// //                       onPressed: _startStopTask,
-// //                       style: ElevatedButton.styleFrom(
-// //                         backgroundColor: isTaskStarted ? Colors.red : Colors.purple,
-// //                         shape: RoundedRectangleBorder(
-// //                           borderRadius: BorderRadius.circular(8),
-// //                         ),
-// //                       ),
-// //                       child: Text(
-// //                         isTaskStarted ? 'Stop Task' : 'Start Task',
-// //                         style: const TextStyle(color: Colors.white),
-// //                       ),
-// //                     ),
-// //                   ],
-// //                 ),
-// //               ),
-// //             ),
-// //             const SizedBox(height: 20),
-
-// //             // Status Section
-// //             const Text(
-// //               'Status',
-// //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// //             ),
-// //             const SizedBox(height: 10),
-// //             DropdownButtonFormField<String>(
-// //               value: taskStatus,
-// //               items: ['To Do', 'In Progress', 'Completed']
-// //                   .map((status) => DropdownMenuItem(
-// //                         value: status,
-// //                         child: Text(status),
-// //                       ))
-// //                   .toList(),
-// //               onChanged: (value) {
-// //                 setState(() {
-// //                   taskStatus = value!;
-// //                 });
-// //               },
-// //               decoration: InputDecoration(
-// //                 border: OutlineInputBorder(
-// //                   borderRadius: BorderRadius.circular(8),
-// //                 ),
-// //               ),
-// //             ),
-// //             const SizedBox(height: 20),
-
-// //             // Add Comments Section
-// //             const Text(
-// //               'Add Comments',
-// //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// //             ),
-// //             const SizedBox(height: 10),
-// //             TextField(
-// //               maxLines: 3,
-// //               decoration: InputDecoration(
-// //                 hintText: 'Enter your comments here',
-// //                 border: OutlineInputBorder(
-// //                   borderRadius: BorderRadius.circular(12),
-// //                 ),
-// //               ),
-// //               onChanged: (value) {
-// //                 setState(() {
-// //                   comment = value;
-// //                 });
-// //               },
-// //             ),
-// //             const SizedBox(height: 20),
-
-// //             // Display Start Time, Current Location, Elapsed Time, and Google Map
-// //             if (isTaskStarted) ...[
-// //               Text(
-// //                 "Task Started At: $taskStartTime",
-// //                 style: const TextStyle(fontSize: 16, color: Colors.green),
-// //               ),
-// //               const SizedBox(height: 10),
-// //               Row(
-// //                 children: [
-// //                   const Icon(Icons.location_pin, color: Colors.purple),
-// //                   const SizedBox(width: 5),
-// //                   Expanded(
-// //                     child: Text(
-// //                       locationName.isNotEmpty
-// //                           ? locationName
-// //                           : 'Fetching location...',
-// //                       style: TextStyle(
-// //                         fontSize: 14,
-// //                         color: Colors.grey[700],
-// //                       ),
-// //                       overflow: TextOverflow.ellipsis,
-// //                     ),
-// //                   ),
-// //                 ],
-// //               ),
-// //               const SizedBox(height: 20),
-// //               // Display elapsed time with clock icon
-// //               Row(
-// //                 children: [
-// //                   const Icon(Icons.access_time, color: Colors.purple),
-// //                   const SizedBox(width: 10),
-// //                   Text(
-// //                     "Elapsed Time: ${_elapsedTime.inHours.toString().padLeft(2, '0')}:${(_elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(_elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}",
-// //                     style: const TextStyle(fontSize: 16, color: Colors.grey),
-// //                   ),
-// //                 ],
-// //               ),
-// //               const SizedBox(height: 20),
-// //               // Google Map
-// //               Container(
-// //                 height: 200,
-// //                 decoration: BoxDecoration(
-// //                   borderRadius: BorderRadius.circular(12),
-// //                   border: Border.all(color: Colors.purple),
-// //                 ),
-// //                 child: GoogleMap(
-// //                   initialCameraPosition: CameraPosition(
-// //                     target: LatLng(_currentPosition?.latitude ?? 0, _currentPosition?.longitude ?? 0),
-// //                     zoom: 14,
-// //                   ),
-// //                   markers: _markers,
-// //                   onMapCreated: (GoogleMapController controller) {
-// //                     mapController = controller;
-// //                   },
-// //                 ),
-// //               ),
-// //             ],
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
-// // }
-
-
-
 // import 'package:flutter/material.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:geolocator/geolocator.dart';
@@ -2037,10 +31,19 @@
 //   Position? _currentPosition;
 //   late GoogleMapController mapController;
 //   Set<Marker> _markers = {};
-  
+
 //   // Timer-related variables
 //   Timer? _timer;
 //   Duration _elapsedTime = Duration.zero;
+//   final TextEditingController _commentController = TextEditingController();
+
+//    // Add Save Task Logic
+//   void _saveTask() {
+//     // Logic to save the task (e.g., send to backend, store in database, etc.)
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text("Task saved successfully!")),
+//     );
+//   }
 
 //   // Method to request location permissions and fetch current location
 //   Future<void> _getCurrentLocation() async {
@@ -2068,7 +71,8 @@
 
 //     if (permission == LocationPermission.deniedForever) {
 //       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text("Location permission permanently denied.")),
+//         const SnackBar(
+//             content: Text("Location permission permanently denied.")),
 //       );
 //       return;
 //     }
@@ -2078,8 +82,7 @@
 
 //     setState(() {
 //       _currentPosition = position;
-//       currentLocation =
-//           'Lat: ${position.latitude}, Lng: ${position.longitude}';
+//       currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
 //     });
 
 //     // Reverse geocode to get location name
@@ -2099,14 +102,30 @@
 //   }
 
 //   // Method to get address from latitude and longitude
+//   // Future<void> _getAddressFromLatLng(double lat, double lng) async {
+//   //   try {
+//   //     List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+//   //     Placemark place = placemarks.first;
+
+//   //     setState(() {
+//   //       locationName =
+//   //           "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+//   //     });
+//   //   } catch (e) {
+//   //     setState(() {
+//   //       locationName = "Unable to fetch location name";
+//   //     });
+//   //   }
+//   // }
+
 //   Future<void> _getAddressFromLatLng(double lat, double lng) async {
 //     try {
 //       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
 //       Placemark place = placemarks.first;
 
 //       setState(() {
-//         locationName =
-//             "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+//         // Extract and format the location name
+//         locationName = "${place.locality}, ${place.administrativeArea}";
 //       });
 //     } catch (e) {
 //       setState(() {
@@ -2120,7 +139,8 @@
 //     if (!isTaskStarted) {
 //       setState(() {
 //         isTaskStarted = true;
-//         taskStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+//         taskStartTime =
+//             DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 //         _elapsedTime = Duration.zero; // Reset the timer
 //       });
 
@@ -2193,12 +213,31 @@
 //                       style: const TextStyle(fontSize: 16),
 //                     ),
 //                     const SizedBox(height: 10),
-//                     Text(
-//                       widget.title,
-//                       style: const TextStyle(
-//                         fontSize: 20,
-//                         fontWeight: FontWeight.bold,
-//                       ),
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         Text(
+//                           widget.title,
+//                           style: const TextStyle(
+//                             fontSize: 20,
+//                             fontWeight: FontWeight.bold,
+//                           ),
+//                         ),
+//                         ElevatedButton(
+//                           onPressed: _startStopTask,
+//                           style: ElevatedButton.styleFrom(
+//                             backgroundColor:
+//                                 isTaskStarted ? Colors.red : Colors.purple,
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius: BorderRadius.circular(8),
+//                             ),
+//                           ),
+//                           child: Text(
+//                             isTaskStarted ? 'Stop Task' : 'Start Task',
+//                             style: const TextStyle(color: Colors.white),
+//                           ),
+//                         ),
+//                       ],
 //                     ),
 //                     const SizedBox(height: 10),
 //                     Text(
@@ -2207,93 +246,168 @@
 //                     ),
 //                     const SizedBox(height: 20),
 //                     // Start/Stop Task Button inside Task Card
-//                     ElevatedButton(
-//                       onPressed: _startStopTask,
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: isTaskStarted ? Colors.red : Colors.purple,
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(8),
-//                         ),
-//                       ),
-//                       child: Text(
-//                         isTaskStarted ? 'Stop Task' : 'Start Task',
-//                         style: const TextStyle(color: Colors.white),
-//                       ),
-//                     ),
+//                     // ElevatedButton(
+//                     //   onPressed: _startStopTask,
+//                     //   style: ElevatedButton.styleFrom(
+//                     //     backgroundColor:
+//                     //         isTaskStarted ? Colors.red : Colors.purple,
+//                     //     shape: RoundedRectangleBorder(
+//                     //       borderRadius: BorderRadius.circular(8),
+//                     //     ),
+//                     //   ),
+//                     //   child: Text(
+//                     //     isTaskStarted ? 'Stop Task' : 'Start Task',
+//                     //     style: const TextStyle(color: Colors.white),
+//                     //   ),
+//                     // ),
+//                     isTaskStarted
+//                         ? Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             children: [
+//                               // Divider
+//                               const Divider(
+//                                 color: Colors.purple,
+//                                 thickness: 2,
+//                                 height: 20,
+//                               ),
+//                               SizedBox(
+//                                 height: 3,
+//                               ),
+//                               Row(
+//                                 children: [
+//                                   SizedBox(
+//                                     width: 10,
+//                                   ),
+//                                   Text(
+//                                     "Active task : ",
+//                                     style: TextStyle(
+//                                         color: Colors.black,
+//                                         fontWeight: FontWeight.bold,
+//                                         fontSize: 17),
+//                                   ),
+//                                   Text(
+//                                     widget.title,
+//                                     style: TextStyle(
+//                                         color: Colors.purple, fontSize: 17),
+//                                   )
+//                                 ],
+//                               ),
+//                               SizedBox(
+//                                 height: 10,
+//                               ),
+//                               // Active Task Section
+//                               Column(
+//                                 mainAxisAlignment: MainAxisAlignment.start,
+//                                 crossAxisAlignment: CrossAxisAlignment.center,
+//                                 children: [
+//                                   Center(
+//                                     child: RichText(
+//                                         text: TextSpan(
+//                                             text: "Started at ",
+//                                             style: TextStyle(
+//                                                 fontSize: 17,
+//                                                 color: Colors.black),
+//                                             children: [
+//                                           TextSpan(
+//                                               text: " $taskStartTime",
+//                                               style: TextStyle(
+//                                                   fontWeight: FontWeight.bold,
+//                                                   fontSize: 17,
+//                                                   color: Colors.black))
+//                                         ])),
+//                                   )
+//                                 ],
+//                               ),
+
+//                               SizedBox(
+//                                 height: 10,
+//                               ),
+//                               // Started Time
+
+//                               Center(
+//                                 child: const Icon(Icons.timer, size: 20),
+//                               ),
+
+//                               Center(
+//                                 child: Text(
+//                                   " ${_elapsedTime.inHours.toString().padLeft(2, '0')}:${(_elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(_elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}",
+//                                   style: TextStyle(
+//                                       fontWeight: FontWeight.bold,
+//                                       fontSize: 17),
+//                                 ),
+//                               ),
+
+//                               // Timer
+
+//                               // GPS Tracking
+//                               Row(
+//                                 mainAxisAlignment:
+//                                     MainAxisAlignment.spaceBetween,
+//                                 children: [
+//                                   RichText(
+//                                     text: TextSpan(
+//                                         text: "Gps tracking:",
+//                                         style: TextStyle(
+//                                             color: Colors.black,
+//                                             fontSize: 20,
+//                                             fontWeight: FontWeight.w400),
+//                                         children: [
+//                                           TextSpan(
+//                                               text: "Active",
+//                                               style: TextStyle(
+//                                                   color: Colors.green,
+//                                                   fontSize: 20,
+//                                                   fontWeight: FontWeight.bold))
+//                                         ]),
+//                                   ),
+//                                   Row(
+//                                     children: [
+//                                       const Icon(Icons.location_pin,
+//                                           size: 20, color: Colors.red),
+//                                       Text(
+//                                         locationName.isNotEmpty
+//                                             ? locationName
+//                                             : 'Fetching location...',
+//                                         style: const TextStyle(fontSize: 20),
+//                                       ),
+//                                     ],
+//                                   ),
+//                                 ],
+//                               ),
+
+//                               // Map Placeholder (Replace with actual map widget if needed)
+//                               Container(
+//                                 margin:
+//                                     const EdgeInsets.symmetric(vertical: 10),
+//                                 height: 200,
+//                                 color: Colors.black12,
+//                                 child: GoogleMap(
+//                                   onMapCreated:
+//                                       (GoogleMapController controller) {
+//                                     mapController = controller;
+//                                   },
+//                                   initialCameraPosition: CameraPosition(
+//                                     target: _currentPosition != null
+//                                         ? LatLng(
+//                                             _currentPosition!.latitude,
+//                                             _currentPosition!.longitude,
+//                                           )
+//                                         : const LatLng(0.0, 0.0),
+//                                     zoom: 15,
+//                                   ),
+//                                   markers: _markers,
+//                                   myLocationEnabled: true,
+//                                   zoomControlsEnabled: false,
+//                                 ),
+//                               ),
+//                             ],
+//                           )
+//                         : Container()
 //                   ],
 //                 ),
 //               ),
 //             ),
-            
-//             const SizedBox(height: 20),
 
-//             // Display Start Time, Current Location, Elapsed Time, and Google Map
-//             if (isTaskStarted) ...[
-//               Text(
-//                 "Task Started At: $taskStartTime",
-//                 style: const TextStyle(fontSize: 16, color: Colors.green),
-//               ),
-//               const SizedBox(height: 10),
-//               Row(
-//                 children: [
-//                   const Icon(Icons.location_pin, color: Colors.purple),
-//                   const SizedBox(width: 5),
-//                   Expanded(
-//                     child: Text(
-//                       locationName.isNotEmpty
-//                           ? locationName
-//                           : 'Fetching location...',
-//                       style: TextStyle(
-//                         fontSize: 14,
-//                         color: Colors.grey[700],
-//                       ),
-//                       overflow: TextOverflow.ellipsis,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               const SizedBox(height: 20),
-//               // Display elapsed time with clock icon
-//               Row(
-//                 children: [
-//                   const Icon(Icons.access_time, color: Colors.purple),
-//                   const SizedBox(width: 10),
-//                   Text(
-//                     "Elapsed Time: ${_elapsedTime.inHours.toString().padLeft(2, '0')}:${(_elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(_elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}",
-//                     style: const TextStyle(fontSize: 16, color: Colors.grey),
-//                   ),
-//                 ],
-//               ),
-//               const SizedBox(height: 20),
-//               // Google Map with rounded corners and border
-//               Container(
-//                 height: 200,
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(12),
-//                   border: Border.all(color: Colors.grey[300]!),
-//                 ),
-//                 child: ClipRRect(
-//                   borderRadius: BorderRadius.circular(12),
-//                   child: GoogleMap(
-//                     onMapCreated: (GoogleMapController controller) {
-//                       mapController = controller;
-//                     },
-//                     initialCameraPosition: CameraPosition(
-//                       target: _currentPosition != null
-//                           ? LatLng(
-//                               _currentPosition!.latitude,
-//                               _currentPosition!.longitude,
-//                             )
-//                           : const LatLng(0.0, 0.0),
-//                       zoom: 15,
-//                     ),
-//                     markers: _markers,
-//                     myLocationEnabled: true,
-//                     zoomControlsEnabled: false,
-//                   ),
-//                 ),
-//               ),
-//             ],
 //             const SizedBox(height: 20),
 
 //             // Status Section
@@ -2324,31 +438,100 @@
 //             const SizedBox(height: 20),
 
 //             // Add Comments Section
+//             // const Text(
+//             //   'Add Comments',
+//             //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//             // ),
+//             // const SizedBox(height: 10),
+//             // TextField(
+//             //   maxLines: 3,
+//             //   decoration: InputDecoration(
+//             //     hintText: 'Enter your comments here',
+//             //     border: OutlineInputBorder(
+//             //       borderRadius: BorderRadius.circular(12),
+//             //     ),
+//             //   ),
+//             //   onChanged: (value) {
+//             //     setState(() {
+//             //       comment = value;
+//             //     });
+//             //   },
+//             // ),
+//             // Add Comments Section
+//             const SizedBox(height: 20),
+
+//             // Add Comments Section
 //             const Text(
 //               'Add Comments',
 //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
 //             ),
 //             const SizedBox(height: 10),
-//             TextField(
-//               maxLines: 3,
-//               decoration: InputDecoration(
-//                 hintText: 'Enter your comments here',
-//                 border: OutlineInputBorder(
-//                   borderRadius: BorderRadius.circular(12),
+//             Row(
+//               children: [
+//                 Expanded(
+//                   child: TextField(
+//                     controller: _commentController,
+//                     maxLines: 2,
+//                     decoration: InputDecoration(
+//                       hintText: 'Enter your comments here',
+//                       border: OutlineInputBorder(
+//                         borderRadius: BorderRadius.circular(8),
+//                       ),
+//                     ),
+//                     onChanged: (value) {
+//                       setState(() {
+//                         comment = value;
+//                       });
+//                     },
+//                   ),
 //                 ),
-//               ),
-//               onChanged: (value) {
-//                 setState(() {
-//                   comment = value;
-//                 });
-//               },
+//                 if (comment
+//                     .trim()
+//                     .isNotEmpty) // Show the send icon only when there's a comment
+//                   IconButton(
+//                     icon: const Icon(Icons.send),
+//                     onPressed: () {
+//                       // Handle sending the comment
+//                       ScaffoldMessenger.of(context).showSnackBar(
+//                         SnackBar(content: Text('Comment submitted: $comment')),
+//                       );
+
+//                       // Clear the comment field
+//                       _commentController.clear();
+//                       setState(() {
+//                         comment = '';
+//                       });
+//                     },
+//                   ),
+                 
+//               ],
 //             ),
+//             SizedBox(height: 20,),
+//              Center(
+//                child: ElevatedButton(
+//                  onPressed: _saveTask,
+//                  style: ElevatedButton.styleFrom(
+//                    backgroundColor: Colors.purple,
+//                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Reduced padding
+//                    minimumSize: const Size(100, 40), // Set a smaller minimum size
+//                    shape: RoundedRectangleBorder(
+//                      borderRadius: BorderRadius.circular(8),
+//                    ),
+//                  ),
+//                  child: const Text(
+//                    "Save Task",
+//                    style: TextStyle(fontSize: 14, color: Colors.white), // Reduced font size
+//                  ),
+//                ),
+//              ),
+
 //           ],
 //         ),
 //       ),
 //     );
 //   }
 // }
+
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -2387,6 +570,15 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
   // Timer-related variables
   Timer? _timer;
   Duration _elapsedTime = Duration.zero;
+  final TextEditingController _commentController = TextEditingController();
+
+   // Add Save Task Logic
+  void _saveTask() {
+    // Logic to save the task (e.g., send to backend, store in database, etc.)
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Task saved successfully!")),
+    );
+  }
 
   // Method to request location permissions and fetch current location
   Future<void> _getCurrentLocation() async {
@@ -2445,38 +637,21 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
   }
 
   // Method to get address from latitude and longitude
-  // Future<void> _getAddressFromLatLng(double lat, double lng) async {
-  //   try {
-  //     List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-  //     Placemark place = placemarks.first;
-
-  //     setState(() {
-  //       locationName =
-  //           "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       locationName = "Unable to fetch location name";
-  //     });
-  //   }
-  // }
-
   Future<void> _getAddressFromLatLng(double lat, double lng) async {
-  try {
-    List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-    Placemark place = placemarks.first;
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      Placemark place = placemarks.first;
 
-    setState(() {
-      // Extract and format the location name
-      locationName = "${place.locality}, ${place.administrativeArea}";
-    });
-  } catch (e) {
-    setState(() {
-      locationName = "Unable to fetch location name";
-    });
+      setState(() {
+        // Extract and format the location name
+        locationName = "${place.locality}, ${place.administrativeArea}";
+      });
+    } catch (e) {
+      setState(() {
+        locationName = "Unable to fetch location name";
+      });
+    }
   }
-}
-
 
   // Start/Stop Task
   void _startStopTask() {
@@ -2528,16 +703,19 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple,
         title: Text(
           widget.title,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.05),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(screenWidth * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -2548,26 +726,26 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
               ),
               elevation: 3,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(screenWidth * 0.04),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Task ID: ${widget.taskId}",
-                      style: const TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: screenWidth * 0.04),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: screenWidth * 0.02),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           widget.title,
-                          style: const TextStyle(
-                            fontSize: 20,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.05,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                          ElevatedButton(
+                        ElevatedButton(
                           onPressed: _startStopTask,
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -2578,179 +756,161 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
                           ),
                           child: Text(
                             isTaskStarted ? 'Stop Task' : 'Start Task',
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: screenWidth * 0.04),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: screenWidth * 0.02),
                     Text(
                       widget.description,
-                      style: const TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: screenWidth * 0.04),
                     ),
-                    const SizedBox(height: 20),
-                    // Start/Stop Task Button inside Task Card
-                    // ElevatedButton(
-                    //   onPressed: _startStopTask,
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor:
-                    //         isTaskStarted ? Colors.red : Colors.purple,
-                    //     shape: RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.circular(8),
-                    //     ),
-                    //   ),
-                    //   child: Text(
-                    //     isTaskStarted ? 'Stop Task' : 'Start Task',
-                    //     style: const TextStyle(color: Colors.white),
-                    //   ),
-                    // ),
-                    isTaskStarted ?  Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Divider
-                      const Divider(
-                        color: Colors.purple,
-                        thickness: 2,
-                        height: 20,
-                      ),
-                      SizedBox(height: 3,),
-                      Row(
-                        children: [
-                          SizedBox(width: 10,),
-                          Text(
-                            "Active task : ",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17),
-                          ),
-                          Text(
-                            widget.title,
-                            style:
-                                TextStyle(color: Colors.purple, fontSize: 17),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 10,),
-                      // Active Task Section
+                    SizedBox(height: screenWidth * 0.05),
+                    if (isTaskStarted)
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Center(
-                            child: RichText(
-                                text: TextSpan(text: "Started at ",
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.black
-                                    ),
-                                    children: [
-                                  TextSpan(text: " $taskStartTime",
-                                      style:
-                                          TextStyle(fontWeight: FontWeight.bold,
-                                          fontSize: 17,
-                                          color: Colors.black))
-                                ])),
-                          )
-                        ],
-                      ),
-
-
-                      SizedBox(
-                        height: 10,
-                      ),
-                      // Started Time
-                   
-                      Center(   child:   const Icon(Icons.timer, size: 20),),
-                    
-                      Center(
-                        child: Text(
-                        
-                          " ${_elapsedTime.inHours.toString().padLeft(2, '0')}:${(_elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(_elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}",
-                          
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-                        ),
-                      ),
-
-                      // Timer
-                  
-
-                      // GPS Tracking
-                      Row(
-                        
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          RichText(text: TextSpan(
-                            text:  "Gps tracking:",style: TextStyle(color: Colors.black,fontSize: 20, fontWeight: FontWeight.w400),
+                          const Divider(
+                            color: Colors.purple,
+                            thickness: 2,
+                            height: 20,
+                          ),
+                          SizedBox(height: screenWidth * 0.02),
+                          Row(
                             children: [
-                              TextSpan(text: "Active", style: TextStyle(color: Colors.green, fontSize: 20,fontWeight: FontWeight.bold))
-                            ]
+                              SizedBox(width: screenWidth * 0.02),
+                              Text(
+                                "Active task : ",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenWidth * 0.045),
+                              ),
+                              Text(
+                                widget.title,
+                                style: TextStyle(
+                                    color: Colors.purple,
+                                    fontSize: screenWidth * 0.045),
+                              )
+                            ],
                           ),
+                          SizedBox(height: screenWidth * 0.02),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: RichText(
+                                    text: TextSpan(
+                                        text: "Started at ",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.04,
+                                            color: Colors.black),
+                                        children: [
+                                      TextSpan(
+                                          text: " $taskStartTime",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: screenWidth * 0.04,
+                                              color: Colors.black))
+                                    ])),
+                              )
+                            ],
                           ),
-                          
-                          Row(children: [
-                               const Icon(Icons.location_pin,
-                              size: 20, color: Colors.red),
-                          Text(
-                                        locationName.isNotEmpty
-                                            ? locationName
-                                            : 'Fetching location...', style: const TextStyle(fontSize: 20),),
-                          ],),
-                      
-                       
-                        ],
-
-                      ),
-
-                      // Map Placeholder (Replace with actual map widget if needed)
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        height: 200,
-                        color: Colors.black12,
-                        child: GoogleMap(
-                                  onMapCreated:
-                                      (GoogleMapController controller) {
-                                    mapController = controller;
-                                  },
-                                  initialCameraPosition: CameraPosition(
-                                    target: _currentPosition != null
-                                        ? LatLng(
-                                            _currentPosition!.latitude,
-                                            _currentPosition!.longitude,
-                                          )
-                                        : const LatLng(0.0, 0.0),
-                                    zoom: 15,
+                          SizedBox(height: screenWidth * 0.02),
+                          Center(
+                            child: const Icon(Icons.timer, size: 20),
+                          ),
+                          Center(
+                            child: Text(
+                              " ${_elapsedTime.inHours.toString().padLeft(2, '0')}:${(_elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(_elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: screenWidth * 0.045),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                    text: "Gps tracking:",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: screenWidth * 0.05,
+                                        fontWeight: FontWeight.w400),
+                                    children: [
+                                      TextSpan(
+                                          text: "Active",
+                                          style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize: screenWidth * 0.05,
+                                              fontWeight: FontWeight.bold))
+                                    ]),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_pin,
+                                      size: 20, color: Colors.red),
+                                  Text(
+                                    locationName.isNotEmpty
+                                        ? locationName
+                                        : 'Fetching location...',
+                                    style: TextStyle(
+                                        fontSize: screenWidth * 0.04),
                                   ),
-                                  markers: _markers,
-                                  myLocationEnabled: true,
-                                  zoomControlsEnabled: false,
-                                ),
-                      ),
-                    ],
-                  )
-                      
-                    :Container()
+                                ],
+                              ),
+                            ],
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: screenWidth * 0.02),
+                            height: screenHeight * 0.3,
+                            color: Colors.black12,
+                            child: GoogleMap(
+                              onMapCreated:
+                                  (GoogleMapController controller) {
+                                mapController = controller;
+                              },
+                              initialCameraPosition: CameraPosition(
+                                target: _currentPosition != null
+                                    ? LatLng(
+                                        _currentPosition!.latitude,
+                                        _currentPosition!.longitude,
+                                      )
+                                    : const LatLng(0.0, 0.0),
+                                zoom: 15,
+                              ),
+                              markers: _markers,
+                              myLocationEnabled: true,
+                              zoomControlsEnabled: false,
+                            ),
+                          ),
+                        ],
+                      )
                   ],
                 ),
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            
-
-            // Status Section
-            const Text(
+            SizedBox(height: screenWidth * 0.05),
+            Text(
               'Status',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: screenWidth * 0.03),
             DropdownButtonFormField<String>(
               value: taskStatus,
               items: ['To Do', 'In Progress', 'Completed']
                   .map((status) => DropdownMenuItem(
                         value: status,
-                        child: Text(status),
+                        child: Text(status,
+                            style: TextStyle(fontSize: screenWidth * 0.04)),
                       ))
                   .toList(),
               onChanged: (value) {
@@ -2764,31 +924,81 @@ class _ShowTaskPageState extends State<ShowTaskPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Add Comments Section
-            const Text(
+            SizedBox(height: screenWidth * 0.05),
+            Text(
               'Add Comments',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
-            TextField(
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Enter your comments here',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            SizedBox(height: screenWidth * 0.03),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _commentController,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your comments here',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        comment = value;
+                      });
+                    },
+                  ),
+                ),
+                if (comment.trim().isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Comment submitted: $comment')),
+                      );
+                      _commentController.clear();
+                      setState(() {
+                        comment = '';
+                      });
+                    },
+                  ),
+              ],
+            ),
+            SizedBox(height: screenWidth * 0.10),
+            Center(
+              child: ElevatedButton(
+                onPressed: _saveTask,
+                // style: ElevatedButton.styleFrom(
+                //   backgroundColor: Colors.purple,
+                //   padding: EdgeInsets.symmetric(
+                //       vertical: screenWidth * 0.02,
+                //       horizontal: screenWidth * 0.04),
+                //   minimumSize: Size(screenWidth * 0.3, screenHeight * 0.05),
+                //   shape: RoundedRectangleBorder(
+                //     borderRadius: BorderRadius.circular(8),
+                //   ),
+                // ),
+                style: ElevatedButton.styleFrom(
+                            minimumSize: Size(screenWidth * 0.8, screenHeight * 0.06),
+                            backgroundColor: Colors.purple,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                          ),
+                child: Text(
+                  "Save Task",
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.04, color: Colors.white),
                 ),
               ),
-              onChanged: (value) {
-                setState(() {
-                  comment = value;
-                });
-              },
             ),
+            
+
           ],
         ),
       ),
     );
   }
 }
+
