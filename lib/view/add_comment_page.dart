@@ -320,31 +320,31 @@ class _CommentsPageState extends State<CommentsPage> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                // Comment Input Field
-                Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      hintText: 'Write a comment...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-                // Send Button
-                IconButton(
-                  icon: Icon(Icons.send, color: Colors.purple),
-                  onPressed: () {
-                    if (_commentController.text.trim().isNotEmpty) {
-                      _addComment(_commentController.text.trim());
-                    }
-                  },
-                ),
-              ],
-            ),
+            // child: Row(
+            //   children: [
+            //     // Comment Input Field
+            //     Expanded(
+            //       child: TextField(
+            //         controller: _commentController,
+            //         decoration: InputDecoration(
+            //           hintText: 'Write a comment...',
+            //           border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(8),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //     // Send Button
+            //     IconButton(
+            //       icon: Icon(Icons.send, color: Colors.purple),
+            //       onPressed: () {
+            //         if (_commentController.text.trim().isNotEmpty) {
+            //           _addComment(_commentController.text.trim());
+            //         }
+            //       },
+            //     ),
+            //   ],
+            // ),
           ),
         ],
       ),

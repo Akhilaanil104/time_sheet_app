@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:time_sheet_app/provider/login_provider.dart';
-import 'package:time_sheet_app/provider/registration_provider.dart';
-import 'package:time_sheet_app/view/login_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() => runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => RegistrationProvider()),
-             ChangeNotifierProvider(create: (_) => LoginProvider()),
+import 'package:time_sheet_app/const/route.dart';
 
-        ],
-        child: MyApp(),
-      ),
-    );
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("Failed to load .env file: $e");
+  }
+  runApp(ProviderScope(child: MyApp()));
+}
+
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      routerConfig: AppRoute.router,
+      // home: LoginPage(),
     );
   }
 }

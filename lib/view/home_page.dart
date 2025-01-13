@@ -750,8 +750,10 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:time_sheet_app/const/route.dart';
 import 'login_page.dart';
 import 'project_detailed_page.dart';
 
@@ -804,6 +806,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+/*************  ✨ Codeium Command ⭐  *************/
+/// Initializes the state of the HomePage by fetching the list of projects and
+/// setting up a listener on the search controller to filter projects based on
+/// user input.
+
+/******  e659ac2e-ae7e-40ce-ab47-2cfddeae2c8f  *******/
   void initState() {
     super.initState();
     fetchProjects();
@@ -1142,10 +1150,11 @@ class _HomePageState extends State<HomePage> {
   // Logout function
   void _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear saved user data
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()), // Navigate to LoginPage
-    );
+    await prefs.clear(); // Clear saved user data'
+    context.go(AppRoute.login);
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => LoginPage()), // Navigate to LoginPage
+    // );
   }
 }

@@ -1475,7 +1475,8 @@ class _TaskCardState extends State<TaskCard> {
                 RichText(
                   text: TextSpan(
                     text: 'Status: ',
-                    style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black),
+                    style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.black38,
+                    ),
                     children: [
                       TextSpan(
                         text: selectedStatus,
@@ -1496,7 +1497,7 @@ class _TaskCardState extends State<TaskCard> {
                   child: Text(
                     "Comments",
                     style: TextStyle(
-                      fontSize: screenWidth * 0.04, color: Colors.black,
+                      fontSize: screenWidth * 0.04, color: Colors.black38,
                     ),
                   ),
                 )
