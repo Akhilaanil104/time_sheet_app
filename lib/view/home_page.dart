@@ -753,7 +753,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:time_sheet_app/const/route.dart';
+import 'package:time_sheet_app/const/router.dart';
 import 'login_page.dart';
 import 'project_detailed_page.dart';
 
@@ -1151,7 +1151,7 @@ class _HomePageState extends State<HomePage> {
   void _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // Clear saved user data'
-    context.go(AppRoute.login);
+    context.go(AppRouter.login);
     // Navigator.pushReplacement(
     //   context,
     //   MaterialPageRoute(builder: (context) => LoginPage()), // Navigate to LoginPage

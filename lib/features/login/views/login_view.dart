@@ -2,10 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:time_sheet_app/const/route.dart';
+import 'package:time_sheet_app/const/router.dart';
 import 'package:time_sheet_app/features/login/model/user_login_model.dart';
 import 'package:time_sheet_app/features/login/provider/login_provider.dart';
 import 'package:time_sheet_app/utils/const/helpers/snackbars/error_snackbar.dart';
+
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -134,7 +135,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                           style: TextStyle(color: Colors.blue),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              context.go(AppRoute.register);
+                              context.go(AppRouter.register);
                             },
                         ),
                       ],

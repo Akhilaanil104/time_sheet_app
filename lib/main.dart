@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:time_sheet_app/const/route.dart';
+import 'package:time_sheet_app/const/router.dart';
 
 
 void main() async {
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: AppRoute.router,
+      routerConfig: AppRouter.router,
       // home: LoginPage(),
     );
   }

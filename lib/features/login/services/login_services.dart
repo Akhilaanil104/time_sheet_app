@@ -4,13 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_sheet_app/features/login/model/suceessful_login_model.dart';
 import 'package:time_sheet_app/features/login/model/user_login_model.dart';
 import 'package:time_sheet_app/utils/const/helpers/failure.dart';
-import 'package:time_sheet_app/utils/const/secrets.dart';
+
+import 'package:time_sheet_app/services/secrets.dart';
 
 final loginServiceProvider = Provider((ref) => LoginServices());
 
 class LoginServices {
-  final String baseUrl = "https://api.brandexperts.ae/api/login/";
-  //  "${AppSecrets.BACKEND_BASE_URL}/login/";
+  final String baseUrl = 
+   "${AppSecrets.BACKEND_BASE_URL}/login/";
  
   final Dio dio = Dio();
 
