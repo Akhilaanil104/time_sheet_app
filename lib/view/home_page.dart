@@ -748,91 +748,56 @@
 // }
 
 
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:time_sheet_app/common/shared_pref_provider.dart';
 import 'package:time_sheet_app/const/router.dart';
-import 'login_page.dart';
-import 'project_detailed_page.dart';
+import 'package:time_sheet_app/features/home/models/project_model.dart';
+import 'package:time_sheet_app/features/home/provider/project_provider.dart';
+import 'package:time_sheet_app/view/project_detailed_page.dart';
 
-class HomePage extends StatefulWidget {
+
+class HomePage extends ConsumerStatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   TextEditingController _searchController = TextEditingController();
-  List<dynamic> _projects = [];
-  List<dynamic> _filteredProjects = [];
-  bool _isLoading = false; // To track loading state
+  List<ProjectModel> _filteredProjects = [];
 
-  Future<void> fetchProjects() async {
-    final url = Uri.parse('https://api.brandexperts.ae/api/projects/');
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM3MjI5Mjc5LCJpYXQiOjE3MzQ2MzcyNzksImp0aSI6ImNjMGUwNWM0ZWM1MjRiZDJhNGUwYTUzMjY5ZjJhMTBjIiwidXNlcl9pZCI6MTZ9.VwN7TjfebbaMl4j_AsMcRH4K4FnUrL_T7CYtIpFVytA',
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      _filterProjects(_searchController.text);
+    });
+    _fetchProjects();
+  }
 
-    if (response.statusCode == 200) {
-      setState(() {
-        _projects = json.decode(response.body);
-        _filteredProjects = _projects; // Initially, no filtering
-      });
-    } else if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Check your token');
-    } else {
-      throw Exception(
-          'Failed to load projects. Status code: ${response.statusCode}');
-    }
+  Future<void> _fetchProjects() async {
+    final notifier = ref.read(userProjectsProvider.notifier);
+    await notifier.fetchUserProjects(context: context);
+    _filteredProjects = ref.read(userProjectsProvider);
   }
 
   void _filterProjects(String query) {
+    final allProjects = ref.read(userProjectsProvider);
     setState(() {
-      _filteredProjects = _projects
+      _filteredProjects = allProjects
           .where((project) =>
-              project['name']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              project['description']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()))
+              project.name.toLowerCase().contains(query.toLowerCase()) ||
+              project.description.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
 
-  @override
-/*************  ✨ Codeium Command ⭐  *************/
-/// Initializes the state of the HomePage by fetching the list of projects and
-/// setting up a listener on the search controller to filter projects based on
-/// user input.
-
-/******  e659ac2e-ae7e-40ce-ab47-2cfddeae2c8f  *******/
-  void initState() {
-    super.initState();
-    fetchProjects();
-    _searchController.addListener(() {
-      _filterProjects(_searchController.text); // Update filtered list on search
-    });
-  }
-
-  // Updated refresh data function with loading indicator
   Future<void> _refreshData() async {
-    setState(() {
-      _isLoading = true; // Show loading indicator
-    });
-
-    // Simulate fetching new data (you can replace with actual API call)
-    await fetchProjects();
-
-    setState(() {
-      _isLoading = false; // Hide loading indicator after data is refreshed
-    });
-
+    await _fetchProjects();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Data updated'),
@@ -844,12 +809,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final projects = ref.watch(userProjectsProvider);
 
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.grey[200],
         body: RefreshIndicator(
-          onRefresh: _refreshData, // This triggers the refresh when pulled down
+          onRefresh: _refreshData,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -862,12 +828,12 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.purple,
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: size.width * 0.05),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: size.height * 0.06),
-                        // Notifications and User Icon with PopupMenu
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -914,7 +880,6 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         SizedBox(height: size.height * 0.02),
-                        // Greeting Section
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -970,7 +935,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
-                // Search Bar
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
                   child: TextField(
@@ -985,7 +949,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: size.height * 0.03),
-                // My Projects Section
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
                   child: Row(
@@ -1003,10 +966,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
-                // Project Cards with ListView.separated
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                  child: _filteredProjects.isEmpty
+                  child: projects.isEmpty
                       ? Center(child: Text('No projects found'))
                       : ListView.separated(
                           shrinkWrap: true,
@@ -1020,18 +982,16 @@ class _HomePageState extends State<HomePage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ProjectDetailedPage(
-                                      title: project['name'] ?? 'No title',
-                                      subtitle: project['description'] ??
-                                          'No description',
+                                      title: project.name,
+                                      subtitle: project.description,
                                     ),
                                   ),
                                 );
                               },
                               child: _buildProjectCard(
                                 size,
-                                title: project['name'] ?? 'No title',
-                                subtitle:
-                                    project['description'] ?? 'No description',
+                                title: project.name,
+                                subtitle: project.description,
                                 totalTasks: 10,
                                 pendingTasks: 5,
                                 completedTasks: 5,
@@ -1042,7 +1002,8 @@ class _HomePageState extends State<HomePage> {
                           },
                           separatorBuilder: (context, index) {
                             return SizedBox(
-                                height: size.height * 0.02); // Space between cards
+                                height:
+                                    size.height * 0.02); // Space between cards
                           },
                         ),
                 ),
@@ -1054,7 +1015,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Helper Widget for Project Cards
   Widget _buildProjectCard(
     Size size, {
     required String title,
@@ -1081,7 +1041,6 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title and Subtitle
           Text(
             title,
             style: TextStyle(
@@ -1102,7 +1061,6 @@ class _HomePageState extends State<HomePage> {
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: size.height * 0.02),
-          // Task Details
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             spacing: size.width * 0.02,
@@ -1125,7 +1083,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           SizedBox(height: size.height * 0.015),
-          // Hours Details
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             spacing: size.width * 0.02,
@@ -1147,14 +1104,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Logout function
   void _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear saved user data'
+    await prefs.clear();
     context.go(AppRouter.login);
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => LoginPage()), // Navigate to LoginPage
-    // );
   }
 }
