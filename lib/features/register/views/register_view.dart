@@ -220,7 +220,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                             email: email,
                             phone_number: phone_number,            
                           );
-
+    
                           registerController.registerUser(data:userData,context: context,  );
                         },
                         style: ElevatedButton.styleFrom(
@@ -265,6 +265,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
       ),
     );
   }
+
 
   Widget _buildLabel(String text, Size size) {
     return Text(

@@ -37,6 +37,9 @@ class RegisterProvider extends Notifier<bool> {
         if (context.mounted) {
           context.go(AppRouter.home); // Navigate to the main app route
         }
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration Successful")),
+      );
       },
     );
   }

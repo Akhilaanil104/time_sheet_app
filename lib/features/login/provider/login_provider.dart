@@ -41,6 +41,9 @@ class LoginProvider extends Notifier<bool> {
         if (context.mounted) {
           context.go(AppRouter.home); // Navigate to main app route
         }
+        ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Login Successful")),
+      );
       },
     );
   }
