@@ -4,12 +4,9 @@
 // import 'package:time_sheet_app/common/shared_pref_provider.dart';
 // import 'package:time_sheet_app/const/router.dart';
 
-
 // import 'package:time_sheet_app/features/login/model/user_login_model.dart';
 // import 'package:time_sheet_app/features/login/services/login_services.dart';
 // import 'package:time_sheet_app/utils/const/helpers/snackbars/error_snackbar.dart';
-
-
 
 // final loginProvider = NotifierProvider<LoginProvider, bool>(
 //   () => LoginProvider(),
@@ -26,7 +23,7 @@
 //         state = true;
 //           final loginServices =
 //         ref.read(loginServiceProvider); // Access LoginServices
-//     final sharedPrefServices = ref.read(sharedPrefServicesProvider); 
+//     final sharedPrefServices = ref.read(sharedPrefServicesProvider);
 //       final result = await loginServices.loginUser(data: loginData);
 //       result.fold(
 //       (failure) {
@@ -45,7 +42,6 @@
 //     );
 //   }
 // }
-
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,10 +72,13 @@ class LoginProvider extends Notifier<bool> {
         ref.read(loginServiceProvider); // Access LoginServices
     final sharedPrefServices = ref.read(sharedPrefServicesProvider);
     final result = await loginServices.loginUser(data: loginData);
+    print(result);
+
     result.fold(
       (failure) {
         // Handle login failure
         state = false;
+        print("im here");
         showErrorSnackbar(message: failure.message, context: context);
       },
       (success) {

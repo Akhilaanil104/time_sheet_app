@@ -7,7 +7,6 @@ import 'package:time_sheet_app/features/login/model/user_login_model.dart';
 import 'package:time_sheet_app/features/login/provider/login_provider.dart';
 import 'package:time_sheet_app/utils/const/helpers/snackbars/error_snackbar.dart';
 
-
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 
@@ -104,8 +103,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                   context: context);
                               return;
                             }
+
                             UserLoginModel userData = UserLoginModel(
                                 username: email, password: password);
+                            print("hi");
                             loginController.loginUser(
                                 context: context, loginData: userData);
                           },

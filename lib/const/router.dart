@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:time_sheet_app/features/Project_details/views/task_view.dart';
 
 
 import 'package:time_sheet_app/features/login/views/login_view.dart';
@@ -35,7 +36,8 @@ class AppRouter {
     ),
     GoRoute(
       path: home,
-      builder: (context, state) =>  HomePage(),
+      builder: (context, state) =>
+       HomePage(),
     ),
    
   ]);

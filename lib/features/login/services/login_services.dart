@@ -10,9 +10,8 @@ import 'package:time_sheet_app/services/secrets.dart';
 final loginServiceProvider = Provider((ref) => LoginServices());
 
 class LoginServices {
-  final String baseUrl = 
-   "${AppSecrets.BACKEND_BASE_URL}/login/";
- 
+  final String baseUrl = "${AppSecrets.BACKEND_BASE_URL}/login/";
+
   final Dio dio = Dio();
 
   Future<Either<Failure, SuceessfulLoginModel>> loginUser(
@@ -21,6 +20,7 @@ class LoginServices {
       print(baseUrl);
       final body = FormData.fromMap(data.toJson());
       final response = await dio.post(baseUrl, data: body);
+      print("hi");
 
       print(response.data);
 

@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:time_sheet_app/common/shared_pref_provider.dart';
+
 import 'package:time_sheet_app/const/router.dart';
 import 'package:time_sheet_app/features/Project_details/views/task_view.dart';
 import 'package:time_sheet_app/features/home/models/project_model.dart';
 import 'package:time_sheet_app/features/home/provider/project_provider.dart';
 import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
-import 'package:time_sheet_app/view/project_detailed_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   @override
@@ -228,13 +227,23 @@ class _HomePageState extends ConsumerState<HomePage> {
                             final project = _filteredProjects[index];
                             return GestureDetector(
                               onTap: () {
-                                ref.read(selectedProjectIdProvider.notifier)
+                                ref
+                                    .read(selectedProjectIdProvider.notifier)
                                     .state = project.id;
-                                
+                                final a = ref
+                                    .read(selectProjectTitleProvider.notifier)
+                                    .state = project.name;
+                                ref
+                                    .read(selectedProjectDescProvider.notifier)
+                                    .state = project.description;
+                                print(a);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => ProjectDetailedPage(title: project.name,subtitle: project.description,)),
+                                      builder: (context) => ProjectDetailedPage(
+                                            title: project.name,
+                                            subtitle: project.description,
+                                          )),
                                 );
                               },
                               child: _buildProjectCard(
@@ -359,5 +368,3 @@ class _HomePageState extends ConsumerState<HomePage> {
     context.go(AppRouter.login);
   }
 }
-
-
