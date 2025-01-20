@@ -117,8 +117,9 @@ class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final tasks = ref.watch(taskUserProvider);
     // final projecTitle = ref.read(selectProjectTitleProvider);
-// final projectTitle =
-//         ref.read(selectProjectTitleProvider) ?? 'Default Title';
+final projectTitle =
+        ref.read(selectProjectTitleProvider) ;
+        print(projectTitle);
 
     return Scaffold(
       appBar: AppBar(
@@ -129,7 +130,7 @@ class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-        // projectTitle,
+        // projectTitle!,
           widget.title,
           style: const TextStyle(color: Colors.white),
         ),

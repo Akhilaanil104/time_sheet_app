@@ -89,8 +89,7 @@ class UserProjectsNotifier extends Notifier<List<ProjectModel>> {
     }
 
     try {
-      final result = 
-      await userProjectService.getUserProject(token, employeeId);
+      final result = await userProjectService.getUserProject(token, employeeId);
       result.fold(
         (failure) {
           showErrorSnackbar(message: failure.message, context: context);
