@@ -1,89 +1,10 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
-
-// class TaskViewPage extends ConsumerWidget {
-//   const TaskViewPage({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     // Accessing the TaskUserProvider
-//     final tasks = ref.watch(taskUserProvider);
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Tasks'),
-//         actions: [
-//           IconButton(
-//             icon: const Icon(Icons.refresh),
-//             onPressed: () async {
-//               // Trigger fetchTask to reload tasks
-//              await ref
-//                   .read(taskUserProvider.notifier)
-//                   .fetchTask(context: context);
-
-//             },
-//           ),
-//         ],
-//       ),
-
-//       // body: tasks.isEmpty
-//       //     ? const Center(
-//       //         child:
-//       //             Text('No tasks available. Select a project to load tasks.'),
-//       //       )
-//           // :
-//           body:  ListView.builder(
-//               itemCount: tasks.length,
-
-//               itemBuilder: (context, index) {
-//                 final task = tasks[index];
-//                print(task);
-
-//                 return Card(
-//                   margin:
-//                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//                   child: ListTile(
-//                     title: Text(task.title),
-//                     subtitle: Text(task.description),
-//                     trailing: Text('${task.completionPercentage}% completed'),
-//                     onTap: () {
-//                       // Navigate to task details or perform any action
-//                       showDialog(
-//                         context: context,
-//                         builder: (_) => AlertDialog(
-//                           title: Text(task.title),
-//                           content: Column(
-//                             mainAxisSize: MainAxisSize.min,
-//                             crossAxisAlignment: CrossAxisAlignment.start,
-//                             children: [
-//                               Text('Priority: ${task.priority}'),
-//                               Text('Status: ${task.status}'),
-//                               Text('Due: ${task.dueDate.toLocal()}'),
-//                             ],
-//                           ),
-//                           actions: [
-//                             TextButton(
-//                               onPressed: () => Navigator.pop(context),
-//                               child: const Text('Close'),
-//                             ),
-//                           ],
-//                         ),
-//                       );
-//                     },
-//                   ),
-//                 );
-//               },
-//             ),
-//     );
-//   }
-// }
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
 import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
+import 'package:time_sheet_app/features/show_tasks/views/show_tasks_view.dart';
 
 import 'package:time_sheet_app/view/add_comment_page.dart';
 import 'package:time_sheet_app/view/showtaskpage.dart';

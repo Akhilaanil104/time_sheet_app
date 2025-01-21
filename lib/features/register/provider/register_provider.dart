@@ -112,7 +112,9 @@ class RegisterProvider extends Notifier<bool> {
         ref.read(registerServiceProvider); // Access RegisterServices
     final sharedPrefServices = ref.read(sharedPrefServicesProvider);
 
-    final result = await registerServices.userRegister(data: data);
+    final result = await registerServices.userRegister(
+      
+      data: data);
     result.fold(
       (failure) {
         state = false;
