@@ -245,11 +245,13 @@ class _TaskCardState extends State<TaskCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.taskTitle,
-                  style: TextStyle(
-                    fontSize: screenWidth > 600 ? 18 : 16,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    widget.taskTitle,
+                    style: TextStyle(
+                      fontSize: screenWidth > 600 ? 18 : 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 ElevatedButton(
