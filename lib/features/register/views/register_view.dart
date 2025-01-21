@@ -77,188 +77,191 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
     final registerController = ref.read(registerProvider.notifier);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: size.width * 0.1),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: size.height * 0.05),
-            Center(
-              child: Text(
-                "Logo",
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: size.height * 0.05),
+              Center(
+                child: Text(
+                  "Logo",
+                  style: TextStyle(
+                    fontSize: size.width * 0.08,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
+              Text(
+                "Register us",
                 style: TextStyle(
-                  fontSize: size.width * 0.08,
+                  fontSize: size.width * 0.05,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-            ),
-            SizedBox(height: size.height * 0.02),
-            Text(
-              "Register us",
-              style: TextStyle(
-                fontSize: size.width * 0.05,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(height: size.height * 0.01),
-            Text(
-              "Create your new account",
-              style: TextStyle(
-                fontSize: size.width * 0.04,
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(height: size.height * 0.02),
-            _buildLabel("Name", size),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: "name",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              SizedBox(height: size.height * 0.01),
+              Text(
+                "Create your new account",
+                style: TextStyle(
+                  fontSize: size.width * 0.04,
+                  color: Colors.grey,
                 ),
               ),
-            ),
-            SizedBox(height: size.height * 0.015),
-            _buildLabel("Phone Number", size),
-            TextField(
-              controller: phoneController,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.phone),
-                hintText: "phone number",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            SizedBox(height: size.height * 0.015),
-            _buildLabel("Email", size),
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.email),
-                hintText: "name@example.com",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            SizedBox(height: size.height * 0.015),
-            _buildLabel("Password", size),
-            TextField(
-              controller: passwordController,
-              obscureText: !isPasswordVisible,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.lock),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+              SizedBox(height: size.height * 0.02),
+              _buildLabel("Name", size),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  hintText: "name",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onPressed: togglePasswordVisibility,
-                ),
-                hintText: "at least 8 characters",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-            ),
-            SizedBox(height: size.height * 0.015),
-            _buildLabel("Confirm Password", size),
-            TextField(
-              controller: confirmPasswordController,
-              obscureText: !isConfirmPasswordVisible,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.lock),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    isConfirmPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+              SizedBox(height: size.height * 0.015),
+              _buildLabel("Phone Number", size),
+              TextField(
+                controller: phoneController,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.phone),
+                  hintText: "phone number",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onPressed: toggleConfirmPasswordVisibility,
-                ),
-                hintText: "Confirm your password",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-            ),
-            SizedBox(height: size.height * 0.02),
-            Center(
-              child: isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: () {
-                        final email = emailController.text.trim();
-                        final password = passwordController.text.trim();
-                        final confirmPassword =
-                            confirmPasswordController.text.trim();
-                        final name = nameController.text.trim();
-                        final phone_number = phoneController.text.trim();
-                        if (email.isEmpty ||
-                            password.isEmpty ||
-                            confirmPassword.isEmpty ||
-                            name.isEmpty ||
-                            phone_number.isEmpty) {
-                          showErrorSnackbar(
-                              message: "Please fill all the fields",
-                              context: context);
-                          return;
-                        }
-                          
-                 
-                        UserRegistrationModel userData = UserRegistrationModel(
-                          username: email,
-                          password: password,
-                          confirmPassword: confirmPassword,
-                          name: name,
-                          email: email,
-                          phone_number: phone_number,            
-                        );
-      
-                        registerController.registerUser(data:userData,context: context,  );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize:
-                            Size(size.width * 0.8, size.height * 0.06),
-                        backgroundColor: Colors.purple,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                        ),
-                      ),
-                      child: Text(
-                        "Register",
-                        style: TextStyle(
-                          fontSize: size.width * 0.045,
-                          color: Colors.white,
-                        ),
-                      ),
+              SizedBox(height: size.height * 0.015),
+              _buildLabel("Email", size),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.email),
+                  hintText: "name@example.com",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.015),
+              _buildLabel("Password", size),
+              TextField(
+                controller: passwordController,
+                obscureText: !isPasswordVisible,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
-            ),
-            SizedBox(height: size.height * 0.10),
-            Center(
-              child: RichText(
-                text: TextSpan(
-                  text: "Already have an account? ",
-                  style: TextStyle(color: Colors.black),
-                  children: [
-                    TextSpan(
-                      text: "Login",
-                      style: TextStyle(color: Colors.blue),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          context.go(AppRouter.login);
+                    onPressed: togglePasswordVisibility,
+                  ),
+                  hintText: "at least 8 characters",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.015),
+              _buildLabel("Confirm Password", size),
+              TextField(
+                controller: confirmPasswordController,
+                obscureText: !isConfirmPasswordVisible,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      isConfirmPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: toggleConfirmPasswordVisibility,
+                  ),
+                  hintText: "Confirm your password",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
+              Center(
+                child: isLoading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: () {
+                          final email = emailController.text.trim();
+                          final password = passwordController.text.trim();
+                          final confirmPassword =
+                              confirmPasswordController.text.trim();
+                          final name = nameController.text.trim();
+                          final phone_number = phoneController.text.trim();
+                          if (email.isEmpty ||
+                              password.isEmpty ||
+                              confirmPassword.isEmpty ||
+                              name.isEmpty ||
+                              phone_number.isEmpty) {
+                            showErrorSnackbar(
+                                message: "Please fill all the fields",
+                                context: context);
+                            return;
+                          }
+                            
+                   
+                          UserRegistrationModel userData = UserRegistrationModel(
+                            username: email,
+                            password: password,
+                            confirmPassword: confirmPassword,
+                            name: name,
+                            email: email,
+                            phone_number: phone_number,            
+                          );
+                
+                          registerController.registerUser(data:userData,context: context,  );
                         },
-                    ),
-                  ],
+                        style: ElevatedButton.styleFrom(
+                          minimumSize:
+                              Size(size.width * 0.8, size.height * 0.06),
+                          backgroundColor: Colors.purple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                          ),
+                        ),
+                        child: Text(
+                          "Register",
+                          style: TextStyle(
+                            fontSize: size.width * 0.045,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+              ),
+              SizedBox(height: size.height * 0.10),
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    text: "Already have an account? ",
+                    style: TextStyle(color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: "Login",
+                        style: TextStyle(color: Colors.blue),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            context.go(AppRouter.login);
+                          },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

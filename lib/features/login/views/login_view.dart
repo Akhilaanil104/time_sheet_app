@@ -26,122 +26,125 @@ class _LoginViewState extends ConsumerState<LoginView> {
     final loginController = ref.read(loginProvider.notifier);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: size.width * 0.1),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: size.height * 0.15),
-            Center(
-              child: Text(
-                "Logo",
-                style: TextStyle(
-                  fontSize: size.width * 0.1,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: size.height * 0.10),
-            Text(
-              "Welcome Back",
-              style: TextStyle(
-                fontSize: size.width * 0.06,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(height: size.height * 0.03),
-            _buildLabel("Username", size),
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: "Username",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            SizedBox(height: size.height * 0.02),
-            _buildLabel("Password", size),
-            TextField(
-              controller: passwordController,
-              obscureText: !isPasswordVisible,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.lock),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: size.height * 0.15),
+              Center(
+                child: Text(
+                  "Logo",
+                  style: TextStyle(
+                    fontSize: size.width * 0.1,
+                    fontWeight: FontWeight.bold,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      isPasswordVisible = !isPasswordVisible;
-                    });
-                  },
-                ),
-                hintText: "at least 8 characters",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-            ),
-            SizedBox(height: size.height * 0.03),
-            Center(
-              child: isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: () async {
-                        final email = usernameController.text.trim();
-                        final password = passwordController.text.trim();
-                        if (email.isEmpty || password.isEmpty) {
-                          showErrorSnackbar(
-                              message: "Please fill in all fields to login",
-                              context: context);
-                          return;
-                        }
-          
-                        UserLoginModel userData = UserLoginModel(
-                            username: email, password: password);
-                        print("hi");
-                        loginController.loginUser(
-                            context: context, loginData: userData);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize:
-                            Size(size.width * 0.8, size.height * 0.06),
-                        backgroundColor: Colors.purple,
-                      ),
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                          fontSize: size.width * 0.045,
-                          color: Colors.white,
+              SizedBox(height: size.height * 0.10),
+              Text(
+                "Welcome Back",
+                style: TextStyle(
+                  fontSize: size.width * 0.06,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: size.height * 0.03),
+              _buildLabel("Username", size),
+              TextField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  hintText: "Username",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
+              _buildLabel("Password", size),
+              TextField(
+                controller: passwordController,
+                obscureText: !isPasswordVisible,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isPasswordVisible = !isPasswordVisible;
+                      });
+                    },
+                  ),
+                  hintText: "at least 8 characters",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.03),
+              Center(
+                child: isLoading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: () async {
+                          final email = usernameController.text.trim();
+                          final password = passwordController.text.trim();
+                          if (email.isEmpty || password.isEmpty) {
+                            showErrorSnackbar(
+                                message: "Please fill in all fields to login",
+                                context: context);
+                            return;
+                          }
+            
+                          UserLoginModel userData = UserLoginModel(
+                              username: email, password: password);
+                          print("hi");
+                          loginController.loginUser(
+                              context: context, loginData: userData);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize:
+                              Size(size.width * 0.8, size.height * 0.06),
+                          backgroundColor: Colors.purple,
+                        ),
+                        child: Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: size.width * 0.045,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-            ),
-            SizedBox(height: size.height * 0.10),
-            Center(
-              child: RichText(
-                text: TextSpan(
-                  text: "Don't have an account? ",
-                  style: TextStyle(color: Colors.black),
-                  children: [
-                    TextSpan(
-                      text: "Register",
-                      style: TextStyle(color: Colors.blue),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          context.go(AppRouter.register);
-                        },
-                    ),
-                  ],
-                ),
               ),
-            ),
-          ],
+              // SizedBox(height: size.height * 0.10),
+              // Center(
+              //   child: RichText(
+              //     text: TextSpan(
+              //       text: "Don't have an account? ",
+              //       style: TextStyle(color: Colors.black),
+              //       children: [
+              //         TextSpan(
+              //           text: "Register",
+              //           style: TextStyle(color: Colors.blue),
+              //           recognizer: TapGestureRecognizer()
+              //             ..onTap = () {
+              //               context.go(AppRouter.register);
+              //             },
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ),
     );

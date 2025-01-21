@@ -4,7 +4,8 @@ class TimesheetUpdateModel {
   final DateTime endTimestamp;
   final String startLocation;
   final String endLocation;
-  final String description;
+  // final String description;
+  final String? description; 
   final String status;
   final double hoursWorked;
   final int employee;
@@ -17,7 +18,8 @@ class TimesheetUpdateModel {
     required this.endTimestamp,
     required this.startLocation,
     required this.endLocation,
-    required this.description,
+    // required this.description,
+    this.description, 
     required this.status,
     required this.hoursWorked,
     required this.employee,

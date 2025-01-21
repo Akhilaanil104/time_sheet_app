@@ -124,7 +124,8 @@ class ProjectModel {
   final String name;
   final String description;
   final DateTime startDate;
-  final DateTime endDate;
+  // final DateTime endDate;
+   final DateTime? endDate;
   final bool assignedAll;
   final List<int> assignedTo;
 
@@ -133,7 +134,7 @@ class ProjectModel {
     required this.name,
     required this.description,
     required this.startDate,
-    required this.endDate,
+     this.endDate,
     required this.assignedAll,
     required this.assignedTo,
   });
@@ -144,7 +145,8 @@ class ProjectModel {
       name: json['name'],
       description: json['description'],
       startDate: DateTime.parse(json['start_date']),
-      endDate: DateTime.parse(json['end_date']),
+      // endDate: DateTime.parse(json['end_date']),
+      endDate: json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
       assignedAll: json['assigned_all'],
       assignedTo: List<int>.from(json['assigned_to']),
     );
@@ -156,7 +158,8 @@ class ProjectModel {
       'name': name,
       'description': description,
       'start_date': startDate.toIso8601String(),
-      'end_date': endDate.toIso8601String(),
+      // 'end_date': endDate.toIso8601String(),
+      'end_date': endDate?.toIso8601String(),
       'assigned_all': assignedAll,
       'assigned_to': assignedTo,
     };

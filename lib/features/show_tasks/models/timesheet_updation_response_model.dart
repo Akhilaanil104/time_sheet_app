@@ -36,7 +36,8 @@ class TimesheetUpdateData {
   final DateTime endTimestamp;
   final String startLocation;
   final String endLocation;
-  final String description;
+  // final String description;
+  final String? description;
   final double hoursWorked;
   final String status;
 
@@ -48,7 +49,8 @@ class TimesheetUpdateData {
     required this.endTimestamp,
     required this.startLocation,
     required this.endLocation,
-    required this.description,
+    // required this.description,
+    this.description,
     required this.hoursWorked,
     required this.status,
   });

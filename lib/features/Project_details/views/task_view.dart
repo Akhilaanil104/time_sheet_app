@@ -84,9 +84,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
 import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
+import 'package:time_sheet_app/features/show_tasks/providers/timesheet_status_provider.dart';
+import 'package:time_sheet_app/features/show_tasks/views/show_tasks_view.dart';
 
 import 'package:time_sheet_app/view/add_comment_page.dart';
-import 'package:time_sheet_app/view/showtaskpage.dart';
+// import 'package:time_sheet_app/view/showtaskpage.dart';
 
 class ProjectDetailedPage extends ConsumerStatefulWidget {
   final String title;
@@ -103,12 +105,28 @@ class ProjectDetailedPage extends ConsumerStatefulWidget {
 }
 
 class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
+  double opacity = 1.0;
   @override
   void initState() {
     super.initState();
     // Fetch tasks when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(taskUserProvider.notifier).fetchTask(context: context);
+    });
+  }
+
+  Future<void> _refreshTasks() async {
+    setState(() {
+      opacity = 0.1; // Start fade-out animation
+    });
+
+    await Future.delayed(const Duration(milliseconds: 300)); // Wait for fade-out
+
+    // Fetch tasks
+    await ref.read(taskUserProvider.notifier).fetchTask(context: context);
+
+    setState(() {
+      opacity = 1.0; // Start fade-in animation
     });
   }
 
@@ -120,6 +138,9 @@ class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
 final projectTitle =
         ref.read(selectProjectTitleProvider) ;
         print(projectTitle);
+
+     final status =    ref.read(selectedTimesheetStatusProvider);
+                                  
 
     return Scaffold(
       appBar: AppBar(
@@ -135,72 +156,83 @@ final projectTitle =
           style: const TextStyle(color: Colors.white),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Description Card
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.title,
-                      style: TextStyle(
-                        fontSize: screenWidth > 600 ? 22 : 18,
-                        fontWeight: FontWeight.bold,
+      body:  RefreshIndicator(
+        onRefresh: _refreshTasks,
+        
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+           physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Description Card
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: TextStyle(
+                          fontSize: screenWidth > 600 ? 22 : 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      widget.subtitle,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      Text(
+                        widget.subtitle,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            // Tasks Header
-            Text(
-              'Tasks',
-              style: TextStyle(
-                fontSize: screenWidth > 600 ? 20 : 16,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 20),
+                  
+              // Tasks Header
+              Text(
+                'Tasks',
+                style: TextStyle(
+                  fontSize: screenWidth > 600 ? 20 : 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-
-            // Task List
-            tasks.isEmpty
-                ? const Center(
-                    child: Text(
-                      "No tasks available.",
-                      style: TextStyle(fontSize: 16),
+              const SizedBox(height: 10),
+                  
+              // Task List
+              tasks.isEmpty
+                  ? const Center(
+                      child: Text(
+                        "No tasks available.",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = tasks[index];
+                        return  AnimatedOpacity(
+                          opacity: opacity,
+                          duration: const Duration(milliseconds: 300),
+                          child:
+                        TaskCard(
+                          taskId: task.id.toString(),
+                          taskTitle: task.title,
+                          taskDescription: task.description,
+                          )
+                        );
+                        
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = tasks[index];
-                      return TaskCard(
-                        taskId: task.id.toString(),
-                        taskTitle: task.title,
-                        taskDescription: task.description,
-                      );
-                    },
-                  ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -314,7 +346,7 @@ class _TaskCardState extends State<TaskCard> {
               children: [
                 RichText(
                   text: TextSpan(
-                    text: 'Status: ',
+                    text: 'Status:  ',
                     style: TextStyle(
                       fontSize: screenWidth * 0.04,
                       color: Colors.black38,

@@ -97,7 +97,8 @@ class TaskModel {
   final List<AssignedTo> assignedTo;
   final String priority;
   final String status;
-  final DateTime dueDate;
+  // final DateTime dueDate;
+  final DateTime? dueDate;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int completionPercentage;
@@ -110,7 +111,8 @@ class TaskModel {
     required this.assignedTo,
     required this.priority,
     required this.status,
-    required this.dueDate,
+    // required this.dueDate,
+    this.dueDate,
     required this.createdAt,
     required this.updatedAt,
     required this.completionPercentage,
@@ -127,7 +129,8 @@ class TaskModel {
           .toList(),
       priority: json['priority'],
       status: json['status'],
-      dueDate: DateTime.parse(json['due_date']),
+      // dueDate: DateTime.parse(json['due_date']),
+      dueDate: json['due_date'] != null ? DateTime.parse(json['due_date']) : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
       completionPercentage: json['completion_percentage'],
@@ -143,7 +146,8 @@ class TaskModel {
       'assigned_to': assignedTo.map((assigned) => assigned.toJson()).toList(),
       'priority': priority,
       'status': status,
-      'due_date': dueDate.toIso8601String(),
+      // 'due_date': dueDate.toIso8601String(),
+       'due_date': dueDate?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'completion_percentage': completionPercentage,

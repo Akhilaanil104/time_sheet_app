@@ -36,7 +36,7 @@ class LoginServices {
       final errorDetail =
           e.response?.data != null && e.response?.data['detail'] != null
               ? e.response?.data['detail']
-              : "An error occurred during login.";
+              : "Invalid username or password.";
       return Left(Failure(errorDetail));
     } catch (e) {
       // Handle unexpected errors

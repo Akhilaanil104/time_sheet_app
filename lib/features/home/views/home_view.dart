@@ -488,6 +488,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final projects = ref.watch(userProjectsProvider);
     final statusList = ref.watch(statusProvider);
 
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.grey[200],
