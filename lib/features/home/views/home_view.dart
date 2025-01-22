@@ -418,6 +418,57 @@ import 'package:time_sheet_app/features/home/provider/project_provider.dart';
 import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
 import 'package:time_sheet_app/features/home/provider/status_provider.dart';
 
+
+
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+
+class LocationService {
+  static Future<String> requestLocationPermission(BuildContext context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enable location services.")),
+      );
+      return "";
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Location permission denied.")),
+        );
+        return "";
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Location permission permanently denied.")),
+      );
+      return "";
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude, position.longitude);
+    Placemark place = placemarks.first;
+
+    return "${place.street}, ${place.subLocality}, ${place.locality}";
+    // return "${position.latitude}, ${position.longitude}";
+  }
+}
+
+
 class HomePage extends ConsumerStatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -437,8 +488,22 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
     _fetchProjects();
      _fetchStatus();
+      _requestLocationAccess();
   }
 
+
+Future<void> _requestLocationAccess() async {
+  final location = await LocationService.requestLocationPermission(context);
+  if (location.isNotEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Location access granted: $location")),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Failed to access location.")),
+    );
+  }
+}
   Future<void> _fetchProjects() async {
     final notifier = ref.read(userProjectsProvider.notifier);
     await notifier.fetchUserProjects(context: context);

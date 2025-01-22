@@ -138,9 +138,8 @@ class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
 final projectTitle =
         ref.read(selectProjectTitleProvider) ;
         print(projectTitle);
-
-     final status =    ref.read(selectedTimesheetStatusProvider);
-                                  
+ final status =    ref.read(selectedTimesheetStatusProvider);
+        
 
     return Scaffold(
       appBar: AppBar(
@@ -223,6 +222,7 @@ final projectTitle =
                           duration: const Duration(milliseconds: 300),
                           child:
                         TaskCard(
+                          status: status,
                           taskId: task.id.toString(),
                           taskTitle: task.title,
                           taskDescription: task.description,
@@ -243,12 +243,14 @@ class TaskCard extends StatefulWidget {
   final String taskId;
   final String taskTitle;
   final String taskDescription;
+  final String status;
 
   const TaskCard({
     Key? key,
     required this.taskId,
     required this.taskTitle,
     required this.taskDescription,
+    required this.status
   }) : super(key: key);
 
   @override
@@ -353,7 +355,7 @@ class _TaskCardState extends State<TaskCard> {
                     ),
                     children: [
                       TextSpan(
-                        text: selectedStatus,
+                        text: widget.status,
                         style: TextStyle(
                           color: Colors.red,
                           fontSize: screenWidth * 0.03,

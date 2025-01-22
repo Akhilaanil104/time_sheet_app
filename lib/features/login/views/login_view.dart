@@ -53,12 +53,12 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 ),
               ),
               SizedBox(height: size.height * 0.03),
-              _buildLabel("Username", size),
+              _buildLabel("Email", size),
               TextField(
                 controller: usernameController,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
-                  hintText: "Username",
+                  hintText: "Email",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
