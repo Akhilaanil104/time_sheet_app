@@ -39,6 +39,7 @@ final sharedPrefServicesProvider = Provider((ref) => SharedPrefServices());
 class SharedPrefServices {
   final String _tokenKey = 'auth_token';
   final String _employeeIdKey = 'employee_id';
+   final String _userIdKey = 'user_id';
 
   // Save token to SharedPreferences
   Future<void> saveToken({required String token}) async {
@@ -52,6 +53,11 @@ class SharedPrefServices {
     await prefs.setInt(_employeeIdKey, employeeId);
   }
 
+  Future<void> saveUserId({required int userId}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_userIdKey, userId);
+  }
+
   // Retrieve token from SharedPreferences
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -63,6 +69,12 @@ class SharedPrefServices {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_employeeIdKey);
   }
+
+  Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_userIdKey);
+  }
+
 
   // Delete token from SharedPreferences
   Future<void> deleteToken() async {

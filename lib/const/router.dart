@@ -31,10 +31,10 @@ class AppRouter {
       path: login,
       builder: (context, state) => LoginView(),
     ),
-     GoRoute(
-      path: register,
-      builder: (context, state) => RegisterView(),
-    ),
+    //  GoRoute(
+    //   path: register,
+    //   builder: (context, state) => RegisterView(),
+    // ),
     GoRoute(
       path: home,
       builder: (context, state) =>

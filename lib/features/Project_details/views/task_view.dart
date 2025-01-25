@@ -83,6 +83,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
+import 'package:time_sheet_app/features/comment/view/comment_display_view.dart';
 import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
 import 'package:time_sheet_app/features/show_tasks/providers/timesheet_status_provider.dart';
 import 'package:time_sheet_app/features/show_tasks/views/show_tasks_view.dart';
@@ -369,7 +370,7 @@ class _TaskCardState extends State<TaskCard> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CommentsPage(),
+                        builder: (context) => CommentDisplayView(taskId: int.parse(widget.taskId)),
                       ),
                     );
                   },
