@@ -1,81 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_sheet_app/common/shared_pref_provider.dart';
-import 'package:time_sheet_app/features/comment/models/comments_add_model.dart';
-import 'package:time_sheet_app/features/comment/models/comments_display_model.dart';
-import 'package:time_sheet_app/features/comment/services/comment_display_services.dart';
+import 'package:time_sheet_app/features/comment/model/comment_display_model.dart';
 
-// Define a model to hold the comments and loading state
-class CommentState {
-  final bool isLoading;
-  final List<CommentModel> comments;
+import 'package:time_sheet_app/features/comment/service/comment_display_service.dart';
 
-  CommentState({this.isLoading = false, this.comments = const []});
+import 'package:time_sheet_app/utils/const/helpers/snackbars/error_snackbar.dart';
 
-  CommentState copyWith({bool? isLoading, List<CommentModel>? comments}) {
-    return CommentState(
-      isLoading: isLoading ?? this.isLoading,
-      comments: comments ?? this.comments,
-    );
-  }
-}
+final displyCommentProvider =
+    NotifierProvider<DisplyCommentProvider, List<CommentDisplayModel>>(
+  () => DisplyCommentProvider(),
+);
 
-// Provider for the comments state
-final commentDisplayProvider =
-    NotifierProvider<CommentDisplayProvider, CommentState>(
-        () => CommentDisplayProvider());
-
-class CommentDisplayProvider extends Notifier<CommentState> {
+class DisplyCommentProvider extends Notifier<List<CommentDisplayModel>> {
   @override
-  CommentState build() {
-    return CommentState();
+  List<CommentDisplayModel> build() {
+    return [];
   }
 
-  Future<void> fetchComment({
-    required BuildContext context,
-    required int taskId,
-  }) async {
+  Future<void> fetchComment(
+      {required BuildContext context, required int taskId}) async {
     final sharedPrefServices = ref.read(sharedPrefServicesProvider);
-    final commentService = ref.watch(commentDisplayServiceProvider);
+    final commentService = ref.read(commentDisplayServiceProvider);
     final token = await sharedPrefServices.getToken();
-    final employeeId = await sharedPrefServices.getUserId();
-
-    if (token == null || employeeId == null) {
-      // Handle missing token or employeeId
-      state = state.copyWith(isLoading: false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong.")),
-      );
+    if (token == null || taskId == null) {
+      showErrorSnackbar(message: "Something went wrong", context: context);
       return;
     }
 
-    // Update state to show loading
-    state = state.copyWith(isLoading: true);
-
     try {
       final result =
-          await commentService.getComments(token, taskId, employeeId);
-
+          await commentService.getComments(token: token, taskId: taskId);
       result.fold(
         (failure) {
-          // Handle failure
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(failure.message)),
-          );
+          showErrorSnackbar(message: failure.message, context: context);
         },
         (comments) {
-          // Update state with fetched comments
-          state = state.copyWith(comments: comments, isLoading: false);
+          state = comments;
         },
       );
     } catch (e) {
-      // Handle unexpected errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An unexpected error occurred: $e")),
-      );
-    } finally {
-      // Ensure loading is set to false
-      state = state.copyWith(isLoading: false);
+      showErrorSnackbar(
+          message: "An expected error occurred: $e", context: context);
     }
   }
 }

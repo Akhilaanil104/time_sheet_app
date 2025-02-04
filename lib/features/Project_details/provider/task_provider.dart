@@ -139,7 +139,7 @@ class TaskUserProvider extends Notifier<List<TaskModel>> {
     try {
       // Fetch tasks for the selected project
       final result =
-          await userTaskService.getTask(token, projectId, employeeId);
+          await userTaskService.getTasks(token, projectId, employeeId);
 
       result.fold(
         (failure) {

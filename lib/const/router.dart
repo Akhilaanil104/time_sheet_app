@@ -4,8 +4,10 @@ import 'package:time_sheet_app/features/home/views/home_view.dart';
 
 
 import 'package:time_sheet_app/features/login/views/login_view.dart';
-import 'package:time_sheet_app/features/register/views/register_view.dart';
+import 'package:time_sheet_app/features/profile/view/profile_view.dart';
+
 import 'package:time_sheet_app/features/splash/view/splash_view.dart';
+
 
 
 
@@ -20,6 +22,10 @@ class AppRouter {
   static const String home = '/home';
   static const String project = '/project';
   static const String task = '/task';
+   static const String profile='/profile';
+ 
+  static const String time='/time';
+
 
   static GoRouter router = GoRouter(initialLocation:splash  , 
   routes: [
@@ -40,6 +46,14 @@ class AppRouter {
       builder: (context, state) =>
        HomePage(),
     ),
+
+     GoRoute(
+      path: profile,
+      builder: (context, state) =>
+       ProfileScreen(),
+    ),
+    
+    
    
   ]);
 }

@@ -112,7 +112,7 @@ class LoginModel {
   // Create a LoginModel instance from a JSON map
   factory LoginModel.fromJson(Map<String, dynamic> json) {
     return LoginModel(
-      username: json['username'] ?? '',
+      username: json['email'] ?? '',
       password: json['password'] ?? '',
       activity: json['activity'] ?? '',
       currentLocation: json['current_location'] ?? '',
