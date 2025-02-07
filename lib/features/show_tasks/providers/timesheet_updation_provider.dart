@@ -174,6 +174,7 @@ class TimesheetUpdateProvider extends Notifier<bool> {
   late final SharedPrefServices _sharedPrefServices;
 
   @override
+
   bool build() {
     _timesheetUpdateService = ref.read(timesheetUpdateServiceProvider);
     _sharedPrefServices = ref.read(sharedPrefServicesProvider);
@@ -199,7 +200,7 @@ class TimesheetUpdateProvider extends Notifier<bool> {
       }
 
       /// ✅ **Fetch `timesheetId` from provider if not passed**
-      final int? storedTimesheetId = timesheetId ?? ref.read(timesheetIdProvider);
+      final int? storedTimesheetId = timesheetId ?? ref.watch(timesheetIdProvider);
 
       /// ✅ **Check if `timesheetId` is valid**
       if (storedTimesheetId == null || storedTimesheetId == 0) {

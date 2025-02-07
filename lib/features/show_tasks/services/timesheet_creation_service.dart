@@ -257,7 +257,7 @@ class TimesheetCreationService {
   final Dio dio = Dio();
 
   /// **Method to post a timesheet**
-  Future<Either<Failure, TimeSheetResponseModel>> postTimesheet({
+  Future<Either<Failure, ResponseTimeSheetData>> postTimesheet({
     required TimeSheetModel data,
     required String token,
  
@@ -287,7 +287,7 @@ class TimesheetCreationService {
         // ref.read(timesheetIdProvider.notifier).state = id;
         print("✅ Timesheet Created Successfully! ID: $id");
 
-        return Right(TimeSheetResponseModel.fromJson(response.data));
+        return Right(ResponseTimeSheetData.fromJson(response.data));
       } else {
         return Left(Failure("Something went wrong! Server responded with: ${response.statusCode}"));
       }

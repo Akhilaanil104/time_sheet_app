@@ -78,7 +78,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_sheet_app/common/shared_pref_provider.dart';
 import 'package:time_sheet_app/features/show_tasks/models/time_sheet_creation_model.dart';
-import 'package:time_sheet_app/features/show_tasks/models/timesheet_response_model.dart';
+
 import 'package:time_sheet_app/features/show_tasks/services/timesheet_creation_service.dart';
 import 'package:time_sheet_app/features/show_tasks/providers/timesheetid_provider.dart';
 import 'package:time_sheet_app/utils/const/helpers/snackbars/error_snackbar.dart';
@@ -128,45 +128,23 @@ final sharedPre = ref.read(sharedPrefServicesProvider);
 
 
 
-//       response.fold(
-//   (failure) {
-//     showErrorSnackbar(message: failure.message, context: context);
-//   },
-//   (successData) {
-//     if (successData.id == null) {
-//       showErrorSnackbar(message: "API did not return a valid Timesheet ID!", context: context);
-//       return;
-//     }
-
-//     // ✅ Store the timesheet ID
-//     ref.read(timesheetIdProvider.notifier).state = successData.id;
-//     print("✅ Stored Timesheet ID in Provider: ${successData.id}");
-    
-//     showSuccessSnackbar(message: "Timesheet created successfully!", context: context);
-//   },
-// );
-
-
-response.fold(
+      response.fold(
   (failure) {
     showErrorSnackbar(message: failure.message, context: context);
   },
   (successData) {
-    final int? newTimesheetId = successData.id;
-
-    if (newTimesheetId == null) {
-      showErrorSnackbar(message: "❌ API did not return a valid Timesheet ID!", context: context);
+    if (successData.data.id == null) {
+      showErrorSnackbar(message: "API did not return a valid Timesheet ID!", context: context);
       return;
     }
 
-    // ✅ Ensure provider is updated properly
-    ref.read(timesheetIdProvider.notifier).state = newTimesheetId;
-    print("✅ Stored Timesheet ID in Provider: ${ref.read(timesheetIdProvider)}");
-
+    // ✅ Store the timesheet ID
+    ref.read(timesheetIdProvider.notifier).state = successData.data.id;
+    print("✅ Stored Timesheet ID in Provider: ${successData.data.id}");
+    
     showSuccessSnackbar(message: "Timesheet created successfully!", context: context);
   },
 );
-
 
     } catch (e) {
       showErrorSnackbar(message: "An error occurred: $e", context: context);

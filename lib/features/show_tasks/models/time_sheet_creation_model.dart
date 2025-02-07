@@ -50,7 +50,22 @@
 
 
 
-
+// {
+//     "task_assignment_id": 2,
+//     "start_location": "Office",
+//     "end_location": "Client Site",
+//     "description": "Working on task",
+//     "status": "ONGOING",
+//     "start_timestamp": "2025-01-29T07:00:00Z",
+//     "end_timestamp": "2025-01-29T17:00:00Z",
+//     "state": "Dubai",
+//     "city": "Dubai",
+//     "street": "Sheikh Zayed Road",
+//     "country": "UAE",
+//     "postal_code": "12345",
+//     "current_longitude": 55.2708,  // Add this
+//     "current_latitude": 25.2048    // Add this
+// }
 class TimeSheetModel {
   
   final int taskAssignmentId;

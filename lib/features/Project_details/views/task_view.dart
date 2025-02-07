@@ -1,95 +1,1088 @@
+// // // // import 'package:flutter/material.dart';
+// // // // import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// // // // import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
+
+// // // // class TaskViewPage extends ConsumerWidget {
+// // // //   const TaskViewPage({Key? key}) : super(key: key);
+
+// // // //   @override
+// // // //   Widget build(BuildContext context, WidgetRef ref) {
+// // // //     // Accessing the TaskUserProvider
+// // // //     final tasks = ref.watch(taskUserProvider);
+
+// // // //     return Scaffold(
+// // // //       appBar: AppBar(
+// // // //         title: const Text('Tasks'),
+// // // //         actions: [
+// // // //           IconButton(
+// // // //             icon: const Icon(Icons.refresh),
+// // // //             onPressed: () async {
+// // // //               // Trigger fetchTask to reload tasks
+// // // //              await ref
+// // // //                   .read(taskUserProvider.notifier)
+// // // //                   .fetchTask(context: context);
+
+// // // //             },
+// // // //           ),
+// // // //         ],
+// // // //       ),
+
+// // // //       // body: tasks.isEmpty
+// // // //       //     ? const Center(
+// // // //       //         child:
+// // // //       //             Text('No tasks available. Select a project to load tasks.'),
+// // // //       //       )
+// // // //           // :
+// // // //           body:  ListView.builder(
+// // // //               itemCount: tasks.length,
+
+// // // //               itemBuilder: (context, index) {
+// // // //                 final task = tasks[index];
+// // // //                print(task);
+
+// // // //                 return Card(
+// // // //                   margin:
+// // // //                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+// // // //                   child: ListTile(
+// // // //                     title: Text(task.title),
+// // // //                     subtitle: Text(task.description),
+// // // //                     trailing: Text('${task.completionPercentage}% completed'),
+// // // //                     onTap: () {
+// // // //                       // Navigate to task details or perform any action
+// // // //                       showDialog(
+// // // //                         context: context,
+// // // //                         builder: (_) => AlertDialog(
+// // // //                           title: Text(task.title),
+// // // //                           content: Column(
+// // // //                             mainAxisSize: MainAxisSize.min,
+// // // //                             crossAxisAlignment: CrossAxisAlignment.start,
+// // // //                             children: [
+// // // //                               Text('Priority: ${task.priority}'),
+// // // //                               Text('Status: ${task.status}'),
+// // // //                               Text('Due: ${task.dueDate.toLocal()}'),
+// // // //                             ],
+// // // //                           ),
+// // // //                           actions: [
+// // // //                             TextButton(
+// // // //                               onPressed: () => Navigator.pop(context),
+// // // //                               child: const Text('Close'),
+// // // //                             ),
+// // // //                           ],
+// // // //                         ),
+// // // //                       );
+// // // //                     },
+// // // //                   ),
+// // // //                 );
+// // // //               },
+// // // //             ),
+// // // //     );
+// // // //   }
+// // // // }
+
+// // // import 'package:flutter/material.dart';
+// // // import 'package:flutter_riverpod/flutter_riverpod.dart';
+// // // import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
+// // // import 'package:time_sheet_app/features/comment/view/comment_display_view.dart';
+// // // import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
+// // // import 'package:time_sheet_app/features/show_tasks/providers/timesheet_status_provider.dart';
+// // // import 'package:time_sheet_app/features/show_tasks/views/show_tasks_view.dart';
+
+// // // import 'package:time_sheet_app/view/add_comment_page.dart';
+// // // // import 'package:time_sheet_app/view/showtaskpage.dart';
+
+// // // class ProjectDetailedPage extends ConsumerStatefulWidget {
+// // //   final String title;
+// // //   final String subtitle;
+
+// // //   const ProjectDetailedPage({
+// // //     Key? key,
+// // //     required this.title,
+// // //     required this.subtitle,
+// // //   }) : super(key: key);
+
+// // //   @override
+// // //   _ProjectDetailedPageState createState() => _ProjectDetailedPageState();
+// // // }
+
+// // // class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
+// // //   double opacity = 1.0;
+// // //   @override
+// // //   void initState() {
+// // //     super.initState();
+// // //     // Fetch tasks when the page loads
+// // //     WidgetsBinding.instance.addPostFrameCallback((_) {
+// // //       ref.read(taskUserProvider.notifier).fetchTask(context: context);
+// // //     });
+// // //   }
+
+// // //   Future<void> _refreshTasks() async {
+// // //     setState(() {
+// // //       opacity = 0.1; // Start fade-out animation
+// // //     });
+
+// // //     await Future.delayed(const Duration(milliseconds: 300)); // Wait for fade-out
+
+// // //     // Fetch tasks
+// // //     await ref.read(taskUserProvider.notifier).fetchTask(context: context);
+
+// // //     setState(() {
+// // //       opacity = 1.0; // Start fade-in animation
+// // //     });
+// // //   }
+
+// // //   @override
+// // //   Widget build(BuildContext context) {
+// // //     final screenWidth = MediaQuery.of(context).size.width;
+// // //     final tasks = ref.watch(taskUserProvider);
+// // //     // final projecTitle = ref.read(selectProjectTitleProvider);
+// // // final projectTitle =
+// // //         ref.read(selectProjectTitleProvider) ;
+// // //         print(projectTitle);
+// // //  final status =    ref.read(selectedTimesheetStatusProvider);
+        
+
+// // //     return Scaffold(
+// // //       appBar: AppBar(
+// // //         backgroundColor: Colors.purple,
+// // //         elevation: 0,
+// // //         leading: IconButton(
+// // //           icon: const Icon(Icons.arrow_back_outlined, color: Colors.white),
+// // //           onPressed: () => Navigator.pop(context),
+// // //         ),
+// // //         title: Text(
+// // //         // projectTitle!,
+// // //           widget.title,
+// // //           style: const TextStyle(color: Colors.white),
+// // //         ),
+// // //       ),
+// // //       body:  RefreshIndicator(
+// // //         onRefresh: _refreshTasks,
+        
+// // //         child: SingleChildScrollView(
+// // //           padding: const EdgeInsets.all(16.0),
+// // //            physics: const AlwaysScrollableScrollPhysics(),
+// // //           child: Column(
+// // //             crossAxisAlignment: CrossAxisAlignment.start,
+// // //             children: [
+// // //               // Description Card
+// // //               Card(
+// // //                 shape: RoundedRectangleBorder(
+// // //                   borderRadius: BorderRadius.circular(12),
+// // //                 ),
+// // //                 elevation: 3,
+// // //                 child: Padding(
+// // //                   padding: const EdgeInsets.all(16.0),
+// // //                   child: Column(
+// // //                     crossAxisAlignment: CrossAxisAlignment.start,
+// // //                     children: [
+// // //                       Text(
+// // //                         widget.title,
+// // //                         style: TextStyle(
+// // //                           fontSize: screenWidth > 600 ? 22 : 18,
+// // //                           fontWeight: FontWeight.bold,
+// // //                         ),
+// // //                       ),
+// // //                       const SizedBox(height: 10),
+// // //                       Text(
+// // //                         widget.subtitle,
+// // //                         style: const TextStyle(fontSize: 14),
+// // //                       ),
+// // //                     ],
+// // //                   ),
+// // //                 ),
+// // //               ),
+// // //               const SizedBox(height: 20),
+                  
+// // //               // Tasks Header
+// // //               Text(
+// // //                 'Tasks',
+// // //                 style: TextStyle(
+// // //                   fontSize: screenWidth > 600 ? 20 : 16,
+// // //                   fontWeight: FontWeight.bold,
+// // //                 ),
+// // //               ),
+// // //               const SizedBox(height: 10),
+                  
+// // //               // Task List
+// // //               tasks.isEmpty
+// // //                   ? const Center(
+// // //                       child: Text(
+// // //                         "No tasks available.",
+// // //                         style: TextStyle(fontSize: 16),
+// // //                       ),
+// // //                     )
+// // //                   : ListView.builder(
+// // //                       shrinkWrap: true,
+// // //                       physics: const NeverScrollableScrollPhysics(),
+// // //                       itemCount: tasks.length,
+// // //                       itemBuilder: (context, index) {
+// // //                         final task = tasks[index];
+// // //                         return  AnimatedOpacity(
+// // //                           opacity: opacity,
+// // //                           duration: const Duration(milliseconds: 300),
+// // //                           child:
+// // //                         TaskCard(
+// // //                           status: status,
+// // //                           taskId: task.id.toString(),
+// // //                           taskTitle: task.title,
+// // //                           taskDescription: task.description,
+// // //                           )
+// // //                         );
+                        
+// // //                       },
+// // //                     ),
+// // //             ],
+// // //           ),
+// // //         ),
+// // //       ),
+// // //     );
+// // //   }
+// // // }
+
+// // // class TaskCard extends StatefulWidget {
+// // //   final String taskId;
+// // //   final String taskTitle;
+// // //   final String taskDescription;
+// // //   final String status;
+
+// // //   const TaskCard({
+// // //     Key? key,
+// // //     required this.taskId,
+// // //     required this.taskTitle,
+// // //     required this.taskDescription,
+// // //     required this.status
+// // //   }) : super(key: key);
+
+// // //   @override
+// // //   _TaskCardState createState() => _TaskCardState();
+// // // }
+
+// // // class _TaskCardState extends State<TaskCard> {
+// // //   bool isExpanded = false;
+// // //   String selectedStatus = "To Do";
+
+// // //   @override
+// // //   Widget build(BuildContext context) {
+// // //     final screenWidth = MediaQuery.of(context).size.width;
+
+// // //     return Card(
+// // //       shape: RoundedRectangleBorder(
+// // //         borderRadius: BorderRadius.circular(12),
+// // //       ),
+// // //       elevation: 3,
+// // //       child: Padding(
+// // //         padding: const EdgeInsets.all(16.0),
+// // //         child: Column(
+// // //           crossAxisAlignment: CrossAxisAlignment.start,
+// // //           children: [
+// // //             // Task Title and Show Task Button
+// // //             Row(
+// // //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// // //               children: [
+// // //                 Expanded(
+// // //                   child: Text(
+// // //                     widget.taskTitle,
+// // //                     style: TextStyle(
+// // //                       fontSize: screenWidth > 600 ? 18 : 16,
+// // //                       fontWeight: FontWeight.bold,
+// // //                     ),
+// // //                   ),
+// // //                 ),
+// // //                 ElevatedButton(
+// // //                   onPressed: () {
+// // //                     Navigator.push(
+// // //                       context,
+// // //                       MaterialPageRoute(
+// // //                         builder: (context) => ShowTaskPage(
+// // //                           taskId: widget.taskId,
+// // //                           title: widget.taskTitle,
+// // //                           description: widget.taskDescription,
+// // //                         ),
+// // //                       ),
+// // //                     );
+// // //                   },
+// // //                   style: ElevatedButton.styleFrom(
+// // //                     backgroundColor: Colors.purple,
+// // //                     shape: RoundedRectangleBorder(
+// // //                       borderRadius: BorderRadius.circular(8),
+// // //                     ),
+// // //                   ),
+// // //                   child: const Text('Show Task',
+// // //                       style: TextStyle(color: Colors.white)),
+// // //                 ),
+// // //               ],
+// // //             ),
+// // //             const SizedBox(height: 8),
+
+// // //             // Task Description with "Show More"/"Show Less"
+// // //             Text(
+// // //               isExpanded
+// // //                   ? widget.taskDescription
+// // //                   : widget.taskDescription.length > 50
+// // //                       ? '${widget.taskDescription.substring(0, 50)}...'
+// // //                       : widget.taskDescription,
+// // //               style: TextStyle(
+// // //                 fontSize: screenWidth > 600 ? 16 : 14,
+// // //               ),
+// // //             ),
+// // //             const SizedBox(height: 8),
+// // //             GestureDetector(
+// // //               onTap: () {
+// // //                 setState(() {
+// // //                   isExpanded = !isExpanded;
+// // //                 });
+// // //               },
+// // //               child: Text(
+// // //                 isExpanded ? 'Show Less' : 'Show More',
+// // //                 style: const TextStyle(
+// // //                   color: Colors.blue,
+// // //                   fontWeight: FontWeight.bold,
+// // //                 ),
+// // //               ),
+// // //             ),
+// // //             const SizedBox(height: 16),
+
+// // //             // Buttons: Status Dropdown and Comments
+// // //             Row(
+// // //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// // //               children: [
+// // //                 RichText(
+// // //                   text: TextSpan(
+// // //                     text: 'Status:  ',
+// // //                     style: TextStyle(
+// // //                       fontSize: screenWidth * 0.04,
+// // //                       color: Colors.black87,
+// // //                     ),
+// // //                     children: [
+// // //                       TextSpan(
+// // //                         text: widget.status,
+// // //                         style: TextStyle(
+// // //                           color: Colors.red,
+// // //                           fontSize: screenWidth * 0.03,
+// // //                         ),
+// // //                       ),
+// // //                     ],
+// // //                   ),
+// // //                 ),
+// // //                 InkWell(
+// // //                   onTap: () {
+// // //                     Navigator.push(
+// // //                       context,
+// // //                       MaterialPageRoute(
+// // //                         builder: (context) => CommentDisplayView(taskId: int.parse(widget.taskId)),
+// // //                       ),
+// // //                     );
+// // //                   },
+// // //                   child: Icon(Icons.comment,
+                    
+                    
+// // //                       color: Colors.black87,
+// // //                     ),
+// // //                   ),
+                
+// // //               ],
+// // //             ),
+// // //           ],
+// // //         ),
+// // //       ),
+// // //     );
+// // //   }
+// // // }
+
+
+
+
+
+
+
+// // // import 'package:flutter/material.dart';
+// // // import 'package:flutter_riverpod/flutter_riverpod.dart';
+// // // import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
+// // // import 'package:time_sheet_app/features/comment/model/comment_display_model.dart';
+
+// // // import 'package:time_sheet_app/features/comment/view/comment_view.dart';
+// // // import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
+
+
+// // // import 'package:time_sheet_app/features/show_tasks/views/old_1_show.dart';
+
+// // // // import 'package:time_sheet_app/view/showtaskpage.dart';
+
+// // // class ProjectDetailedPage extends ConsumerStatefulWidget {
+// // //   final String title;
+// // //   final String subtitle;
+
+// // //   const ProjectDetailedPage({
+// // //     Key? key,
+// // //     required this.title,
+// // //     required this.subtitle,
+// // //   }) : super(key: key);
+
+// // //   @override
+// // //   _ProjectDetailedPageState createState() => _ProjectDetailedPageState();
+// // // }
+
+// // // class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
+// // //   double opacity = 1.0;
+// // //   @override
+// // //   void initState() {
+// // //     super.initState();
+// // //     // Fetch tasks when the page loads
+// // //     WidgetsBinding.instance.addPostFrameCallback((_) {
+// // //       ref.read(taskUserProvider.notifier).fetchTask(context: context);
+// // //     });
+// // //   }
+
+// // //   Future<void> _refreshTasks() async {
+// // //     setState(() {
+// // //       opacity = 0.1; // Start fade-out animation
+// // //     });
+
+// // //     await Future.delayed(const Duration(milliseconds: 300)); // Wait for fade-out
+
+// // //     // Fetch tasks
+// // //     await ref.read(taskUserProvider.notifier).fetchTask(context: context);
+
+// // //     setState(() {
+// // //       opacity = 1.0; // Start fade-in animation
+// // //     });
+// // //   }
+
+// // //   @override
+// // //   Widget build(BuildContext context) {
+// // //     final screenWidth = MediaQuery.of(context).size.width;
+// // //     final tasks = ref.watch(taskUserProvider);
+// // //     // final projecTitle = ref.read(selectProjectTitleProvider);
+// // // final projectTitle =
+// // //         ref.read(selectProjectTitleProvider) ;
+// // //         print(projectTitle);
+// // //  final status =    ref.read(selectedTimesheetStatusProvider);
+        
+
+// // //     return Scaffold(
+// // //       appBar: AppBar(
+// // //         backgroundColor: Colors.purple,
+// // //         elevation: 0,
+// // //         leading: IconButton(
+// // //           icon: const Icon(Icons.arrow_back_outlined, color: Colors.white),
+// // //           onPressed: () => Navigator.pop(context),
+// // //         ),
+// // //         title: Text(
+// // //         // projectTitle!,
+// // //           widget.title,
+// // //           style: const TextStyle(color: Colors.white),
+// // //         ),
+// // //       ),
+// // //       body:  RefreshIndicator(
+// // //         onRefresh: _refreshTasks,
+        
+// // //         child: SingleChildScrollView(
+// // //           padding: const EdgeInsets.all(16.0),
+// // //            physics: const AlwaysScrollableScrollPhysics(),
+// // //           child: Column(
+// // //             crossAxisAlignment: CrossAxisAlignment.start,
+// // //             children: [
+// // //               // Description Card
+// // //               Card(
+// // //                 shape: RoundedRectangleBorder(
+// // //                   borderRadius: BorderRadius.circular(12),
+// // //                 ),
+// // //                 elevation: 3,
+// // //                 child: Padding(
+// // //                   padding: const EdgeInsets.all(16.0),
+// // //                   child: Column(
+// // //                     crossAxisAlignment: CrossAxisAlignment.start,
+// // //                     children: [
+// // //                       Text(
+// // //                         widget.title,
+// // //                         style: TextStyle(
+// // //                           fontSize: screenWidth > 600 ? 22 : 18,
+// // //                           fontWeight: FontWeight.bold,
+// // //                         ),
+// // //                       ),
+// // //                       const SizedBox(height: 10),
+// // //                       Text(
+// // //                         widget.subtitle,
+// // //                         style: const TextStyle(fontSize: 14),
+// // //                       ),
+// // //                     ],
+// // //                   ),
+// // //                 ),
+// // //               ),
+// // //               const SizedBox(height: 20),
+                  
+// // //               // Tasks Header
+// // //               Text(
+// // //                 'Tasks',
+// // //                 style: TextStyle(
+// // //                   fontSize: screenWidth > 600 ? 20 : 16,
+// // //                   fontWeight: FontWeight.bold,
+// // //                 ),
+// // //               ),
+// // //               const SizedBox(height: 10),
+                  
+// // //               // Task List
+// // //               tasks.isEmpty
+// // //                   ? const Center(
+// // //                       child: Text(
+// // //                         "No tasks available.",
+// // //                         style: TextStyle(fontSize: 16),
+// // //                       ),
+// // //                     )
+// // //                   : ListView.builder(
+// // //                       shrinkWrap: true,
+// // //                       physics: const NeverScrollableScrollPhysics(),
+// // //                       itemCount: tasks.length,
+// // //                       itemBuilder: (context, index) {
+// // //                         final task = tasks[index];
+// // //                         return  AnimatedOpacity(
+// // //                           opacity: opacity,
+// // //                           duration: const Duration(milliseconds: 300),
+// // //                           child:
+                        
+// // //                         // TaskCard(
+// // //                         //   status: task.status ,
+// // //                         //   taskId: task.taskAssignmentId.toString(),
+// // //                         //   taskTitle: task.taskTitle,
+// // //                         //   taskDescription: task.taskDescription,
+// // //                         //   )
+
+// // //                         TaskCard(
+// // //                               status: task
+// // //                                   .status, // Assuming status is always non-null
+// // //                               taskId: task.taskAssignmentId
+// // //                                   .toString(), // Convert int to String safely
+// // //                               taskTitle:
+// // //                                   task.taskTitle, // Assuming it's non-null
+// // //                               taskDescription: task.taskDescription ??
+// // //                                   "No description available", // Handle null case
+// // //                             )
+
+// // //                         );
+                        
+// // //                       },
+// // //                     ),
+// // //             ],
+// // //           ),
+// // //         ),
+// // //       ),
+// // //     );
+// // //   }
+// // // }
+
+// // // class TaskCard extends ConsumerStatefulWidget {
+// // //   final String taskId;
+// // //   final String taskTitle;
+// // //   final String taskDescription;
+// // //   final String status;
+
+// // //   const TaskCard({
+// // //     Key? key,
+// // //     required this.taskId,
+// // //     required this.taskTitle,
+// // //     required this.taskDescription,
+// // //     required this.status
+// // //   }) : super(key: key);
+
+// // //   @override
+// // //   _TaskCardState createState() => _TaskCardState();
+// // // }
+
+// // // class _TaskCardState extends ConsumerState<TaskCard> {
+// // //   bool isExpanded = false;
+// // //   String selectedStatus = "To Do";
+    
+  
+
+// // //   @override
+// // //   Widget build(BuildContext context) {
+    
+// // //     final screenWidth = MediaQuery.of(context).size.width;
+
+// // //     return Card(
+// // //       shape: RoundedRectangleBorder(
+// // //         borderRadius: BorderRadius.circular(12),
+// // //       ),
+// // //       elevation: 3,
+// // //       child: Padding(
+// // //         padding: const EdgeInsets.all(16.0),
+// // //         child: Column(
+// // //           crossAxisAlignment: CrossAxisAlignment.start,
+// // //           children: [
+// // //             // Task Title and Show Task Button
+// // //             Row(
+// // //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// // //               children: [
+// // //                 Expanded(
+// // //                   child: Text(
+// // //                     widget.taskTitle,
+// // //                     style: TextStyle(
+// // //                       fontSize: screenWidth > 600 ? 18 : 16,
+// // //                       fontWeight: FontWeight.bold,
+// // //                     ),
+// // //                   ),
+// // //                 ),
+// // //                 ElevatedButton(
+// // //                   onPressed: () {
+// // //                     Navigator.push(
+// // //                       context,
+// // //                       MaterialPageRoute(
+// // //                         builder: (context) => ShowTaskPage(
+// // //                           // taskAssignmentId: widget.taskId,
+// // //                           taskId: widget.taskId,
+// // //                           title: widget.taskTitle,
+// // //                           description: widget.taskDescription,
+// // //                         ),
+// // //                       ),
+// // //                     );
+// // //                   },
+// // //                   style: ElevatedButton.styleFrom(
+// // //                     backgroundColor: Colors.purple,
+// // //                     shape: RoundedRectangleBorder(
+// // //                       borderRadius: BorderRadius.circular(8),
+// // //                     ),
+// // //                   ),
+// // //                   child: const Text('Show Task',
+// // //                       style: TextStyle(color: Colors.white)),
+// // //                 ),
+// // //               ],
+// // //             ),
+// // //             const SizedBox(height: 8),
+
+// // //             // Task Description with "Show More"/"Show Less"
+// // //             Text(
+// // //               isExpanded
+// // //                   ? widget.taskDescription
+// // //                   : widget.taskDescription.length > 50
+// // //                       ? '${widget.taskDescription.substring(0, 50)}...'
+// // //                       : widget.taskDescription,
+// // //               style: TextStyle(
+// // //                 fontSize: screenWidth > 600 ? 16 : 14,
+// // //               ),
+// // //             ),
+// // //             const SizedBox(height: 8),
+// // //             GestureDetector(
+// // //               onTap: () {
+// // //                 setState(() {
+// // //                   isExpanded = !isExpanded;
+// // //                 });
+// // //               },
+// // //               child: Text(
+// // //                 isExpanded ? 'Show Less' : 'Show More',
+// // //                 style: const TextStyle(
+// // //                   color: Colors.blue,
+// // //                   fontWeight: FontWeight.bold,
+// // //                 ),
+// // //               ),
+// // //             ),
+// // //             const SizedBox(height: 16),
+
+// // //             // Buttons: Status Dropdown and Comments
+// // //             Row(
+// // //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// // //               children: [
+// // //                 RichText(
+// // //                   text: TextSpan(
+// // //                     text: 'Status:  ',
+// // //                     style: TextStyle(
+// // //                       fontSize: screenWidth * 0.04,
+// // //                       color: Colors.black38,
+// // //                     ),
+// // //                     children: [
+// // //                       TextSpan(
+// // //                         text: widget.status,
+// // //                         // ref.watch(timesheetUpdateProvider.notifier).status,
+// // //                         // text: widget.status,
+// // //                         style: TextStyle(
+// // //                           color: Colors.red,
+// // //                           fontSize: screenWidth * 0.03,
+// // //                         ),
+// // //                       ),
+// // //                     ],
+// // //                   ),
+// // //                 ),
+// // //                 InkWell(
+// // //                   onTap: () {
+// // //                     Navigator.push(
+// // //                       context,
+// // //                       MaterialPageRoute(
+// // //                         builder: (context) => CommentsView(taskId: int.parse(widget.taskId)),
+// // //                       ),
+// // //                     );
+// // //                   },
+// // //                   child: Text(
+// // //                     "Comments",
+// // //                     style: TextStyle(
+// // //                       fontSize: screenWidth * 0.04,
+// // //                       color: Colors.black38,
+// // //                     ),
+// // //                   ),
+// // //                 ),
+// // //               ],
+// // //             ),
+// // //           ],
+// // //         ),
+// // //       ),
+// // //     );
+// // //   }
+// // // }
+
+
+
+
 // // import 'package:flutter/material.dart';
 // // import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 // // import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
+// // import 'package:time_sheet_app/features/comment/model/comment_display_model.dart';
 
-// // class TaskViewPage extends ConsumerWidget {
-// //   const TaskViewPage({Key? key}) : super(key: key);
+// // import 'package:time_sheet_app/features/comment/view/comment_view.dart';
+// // import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
+// // import 'package:time_sheet_app/features/show_tasks/providers/timesheet_status_provider.dart';
+
+// // import 'package:time_sheet_app/features/show_tasks/views/old_1_show.dart';
+// // import 'package:time_sheet_app/features/show_tasks/views/show_tasks_view.dart';
+
+
+
+
+// // // import 'package:time_sheet_app/view/showtaskpage.dart';
+
+// // class ProjectDetailedPage extends ConsumerStatefulWidget {
+// //   final String title;
+// //   final String subtitle;
+
+// //   const ProjectDetailedPage({
+// //     Key? key,
+// //     required this.title,
+// //     required this.subtitle,
+// //   }) : super(key: key);
 
 // //   @override
-// //   Widget build(BuildContext context, WidgetRef ref) {
-// //     // Accessing the TaskUserProvider
+// //   _ProjectDetailedPageState createState() => _ProjectDetailedPageState();
+// // }
+
+// // class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
+// //   double opacity = 1.0;
+// //   @override
+// //   void initState() {
+// //     super.initState();
+// //     // Fetch tasks when the page loads
+// //     WidgetsBinding.instance.addPostFrameCallback((_) {
+// //       ref.read(taskUserProvider.notifier).fetchTask(context: context);
+// //     });
+// //   }
+
+// //   Future<void> _refreshTasks() async {
+// //     setState(() {
+// //       opacity = 0.1; // Start fade-out animation
+// //     });
+
+// //     await Future.delayed(const Duration(milliseconds: 300)); // Wait for fade-out
+
+// //     // Fetch tasks
+// //     await ref.read(taskUserProvider.notifier).fetchTask(context: context);
+
+// //     setState(() {
+// //       opacity = 1.0; // Start fade-in animation
+// //     });
+// //   }
+
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     final screenWidth = MediaQuery.of(context).size.width;
 // //     final tasks = ref.watch(taskUserProvider);
+// //     // final projecTitle = ref.read(selectProjectTitleProvider);
+// // final projectTitle =
+// //         ref.read(selectProjectTitleProvider) ;
+// //         print(projectTitle);
+// //  final status =    ref.read(selectedTimesheetStatusProvider);
+        
 
 // //     return Scaffold(
 // //       appBar: AppBar(
-// //         title: const Text('Tasks'),
-// //         actions: [
-// //           IconButton(
-// //             icon: const Icon(Icons.refresh),
-// //             onPressed: () async {
-// //               // Trigger fetchTask to reload tasks
-// //              await ref
-// //                   .read(taskUserProvider.notifier)
-// //                   .fetchTask(context: context);
-
-// //             },
-// //           ),
-// //         ],
+// //         backgroundColor: Colors.purple,
+// //         elevation: 0,
+// //         leading: IconButton(
+// //           icon: const Icon(Icons.arrow_back_outlined, color: Colors.white),
+// //           onPressed: () => Navigator.pop(context),
+// //         ),
+// //         title: Text(
+// //         // projectTitle!,
+// //           widget.title,
+// //           style: const TextStyle(color: Colors.white),
+// //         ),
 // //       ),
-
-// //       // body: tasks.isEmpty
-// //       //     ? const Center(
-// //       //         child:
-// //       //             Text('No tasks available. Select a project to load tasks.'),
-// //       //       )
-// //           // :
-// //           body:  ListView.builder(
-// //               itemCount: tasks.length,
-
-// //               itemBuilder: (context, index) {
-// //                 final task = tasks[index];
-// //                print(task);
-
-// //                 return Card(
-// //                   margin:
-// //                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-// //                   child: ListTile(
-// //                     title: Text(task.title),
-// //                     subtitle: Text(task.description),
-// //                     trailing: Text('${task.completionPercentage}% completed'),
-// //                     onTap: () {
-// //                       // Navigate to task details or perform any action
-// //                       showDialog(
-// //                         context: context,
-// //                         builder: (_) => AlertDialog(
-// //                           title: Text(task.title),
-// //                           content: Column(
-// //                             mainAxisSize: MainAxisSize.min,
-// //                             crossAxisAlignment: CrossAxisAlignment.start,
-// //                             children: [
-// //                               Text('Priority: ${task.priority}'),
-// //                               Text('Status: ${task.status}'),
-// //                               Text('Due: ${task.dueDate.toLocal()}'),
-// //                             ],
-// //                           ),
-// //                           actions: [
-// //                             TextButton(
-// //                               onPressed: () => Navigator.pop(context),
-// //                               child: const Text('Close'),
-// //                             ),
-// //                           ],
+// //       body:  RefreshIndicator(
+// //         onRefresh: _refreshTasks,
+        
+// //         child: SingleChildScrollView(
+// //           padding: const EdgeInsets.all(16.0),
+// //            physics: const AlwaysScrollableScrollPhysics(),
+// //           child: Column(
+// //             crossAxisAlignment: CrossAxisAlignment.start,
+// //             children: [
+// //               // Description Card
+// //               Card(
+// //                 shape: RoundedRectangleBorder(
+// //                   borderRadius: BorderRadius.circular(12),
+// //                 ),
+// //                 elevation: 3,
+// //                 child: Padding(
+// //                   padding: const EdgeInsets.all(16.0),
+// //                   child: Column(
+// //                     crossAxisAlignment: CrossAxisAlignment.start,
+// //                     children: [
+// //                       Text(
+// //                         widget.title,
+// //                         style: TextStyle(
+// //                           fontSize: screenWidth > 600 ? 22 : 18,
+// //                           fontWeight: FontWeight.bold,
 // //                         ),
-// //                       );
-// //                     },
+// //                       ),
+// //                       const SizedBox(height: 10),
+// //                       Text(
+// //                         widget.subtitle,
+// //                         style: const TextStyle(fontSize: 14),
+// //                       ),
+// //                     ],
 // //                   ),
-// //                 );
-// //               },
-// //             ),
+// //                 ),
+// //               ),
+// //               const SizedBox(height: 20),
+                  
+// //               // Tasks Header
+// //               Text(
+// //                 'Tasks',
+// //                 style: TextStyle(
+// //                   fontSize: screenWidth > 600 ? 20 : 16,
+// //                   fontWeight: FontWeight.bold,
+// //                 ),
+// //               ),
+// //               const SizedBox(height: 10),
+                  
+// //               // Task List
+// //               tasks.isEmpty
+// //                   ? const Center(
+// //                       child: Text(
+// //                         "No tasks available.",
+// //                         style: TextStyle(fontSize: 16),
+// //                       ),
+// //                     )
+// //                   : ListView.builder(
+// //                       shrinkWrap: true,
+// //                       physics: const NeverScrollableScrollPhysics(),
+// //                       itemCount: tasks.length,
+// //                       itemBuilder: (context, index) {
+// //                         final task = tasks[index];
+// //                         return  AnimatedOpacity(
+// //                           opacity: opacity,
+// //                           duration: const Duration(milliseconds: 300),
+// //                           child:
+                        
+// //                         // TaskCard(
+// //                         //   status: task.status ,
+// //                         //   taskId: task.taskAssignmentId.toString(),
+// //                         //   taskTitle: task.taskTitle,
+// //                         //   taskDescription: task.taskDescription,
+// //                         //   )
+
+// //                         TaskCard(
+// //                               status: task
+// //                                   .status, // Assuming status is always non-null
+// //                               taskId: task.taskAssignmentId
+// //                                   .toString(), // Convert int to String safely
+// //                               taskTitle:
+// //                                   task.taskTitle, // Assuming it's non-null
+// //                               taskDescription: task.taskDescription ??
+// //                                   "No description available", // Handle null case
+// //                             )
+
+// //                         );
+                        
+// //                       },
+// //                     ),
+// //             ],
+// //           ),
+// //         ),
+// //       ),
 // //     );
 // //   }
 // // }
 
+// // class TaskCard extends ConsumerStatefulWidget {
+// //   final String taskId;
+// //   final String taskTitle;
+// //   final String taskDescription;
+// //   final String status;
+
+// //   const TaskCard({
+// //     Key? key,
+// //     required this.taskId,
+// //     required this.taskTitle,
+// //     required this.taskDescription,
+// //     required this.status
+// //   }) : super(key: key);
+
+// //   @override
+// //   _TaskCardState createState() => _TaskCardState();
+// // }
+
+// // class _TaskCardState extends ConsumerState<TaskCard> {
+// //   bool isExpanded = false;
+// //   String selectedStatus = "To Do";
+    
+  
+
+// //   @override
+// //   Widget build(BuildContext context) {
+    
+// //     final screenWidth = MediaQuery.of(context).size.width;
+
+// //     return Card(
+// //       shape: RoundedRectangleBorder(
+// //         borderRadius: BorderRadius.circular(12),
+// //       ),
+// //       elevation: 3,
+// //       child: Padding(
+// //         padding: const EdgeInsets.all(16.0),
+// //         child: Column(
+// //           crossAxisAlignment: CrossAxisAlignment.start,
+// //           children: [
+// //             // Task Title and Show Task Button
+// //             Row(
+// //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// //               children: [
+// //                 Expanded(
+// //                   child: Text(
+// //                     widget.taskTitle,
+// //                     style: TextStyle(
+// //                       fontSize: screenWidth > 600 ? 18 : 16,
+// //                       fontWeight: FontWeight.bold,
+// //                     ),
+// //                   ),
+// //                 ),
+// //                 ElevatedButton(
+// //                   onPressed: () {
+// //                     Navigator.push(
+// //                       context,
+// //                       MaterialPageRoute(
+// //                         builder: (context) => ShowTaskPage(taskId: widget.taskId,
+// //                          title: widget.taskTitle, description: widget.taskDescription
+// //                          ),
+// //                         //  ShowTaskPage(
+// //                         //   taskAssignmentId: widget.taskId,
+// //                         //   taskId: widget.taskId,
+// //                         //   title: widget.taskTitle,
+// //                         //   description: widget.taskDescription,
+// //                         // ),
+// //                       ),
+// //                     );
+// //                   },
+// //                   style: ElevatedButton.styleFrom(
+// //                     backgroundColor: Colors.purple,
+// //                     shape: RoundedRectangleBorder(
+// //                       borderRadius: BorderRadius.circular(8),
+// //                     ),
+// //                   ),
+// //                   child: const Text('Show Task',
+// //                       style: TextStyle(color: Colors.white)),
+// //                 ),
+// //               ],
+// //             ),
+// //             const SizedBox(height: 8),
+
+// //             // Task Description with "Show More"/"Show Less"
+// //             Text(
+// //               isExpanded
+// //                   ? widget.taskDescription
+// //                   : widget.taskDescription.length > 50
+// //                       ? '${widget.taskDescription.substring(0, 50)}...'
+// //                       : widget.taskDescription,
+// //               style: TextStyle(
+// //                 fontSize: screenWidth > 600 ? 16 : 14,
+// //               ),
+// //             ),
+// //             const SizedBox(height: 8),
+// //             GestureDetector(
+// //               onTap: () {
+// //                 setState(() {
+// //                   isExpanded = !isExpanded;
+// //                 });
+// //               },
+// //               child: Text(
+// //                 isExpanded ? 'Show Less' : 'Show More',
+// //                 style: const TextStyle(
+// //                   color: Colors.blue,
+// //                   fontWeight: FontWeight.bold,
+// //                 ),
+// //               ),
+// //             ),
+// //             const SizedBox(height: 16),
+
+// //             // Buttons: Status Dropdown and Comments
+// //             Row(
+// //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// //               children: [
+// //                 RichText(
+// //                   text: TextSpan(
+// //                     text: 'Status:  ',
+// //                     style: TextStyle(
+// //                       fontSize: screenWidth * 0.04,
+// //                       color: Colors.black38,
+// //                     ),
+// //                     children: [
+// //                       TextSpan(
+// //                         text: widget.status,
+// //                         // ref.watch(timesheetUpdateProvider.notifier).status,
+// //                         // text: widget.status,
+// //                         style: TextStyle(
+// //                           color: Colors.red,
+// //                           fontSize: screenWidth * 0.03,
+// //                         ),
+// //                       ),
+// //                     ],
+// //                   ),
+// //                 ),
+// //                 InkWell(
+// //                   onTap: () {
+// //                     Navigator.push(
+// //                       context,
+// //                       MaterialPageRoute(
+// //                         builder: (context) => CommentsView(taskId: int.parse(widget.taskId)),
+// //                       ),
+// //                     );
+// //                   },
+// //                   child: Text(
+// //                     "Comments",
+// //                     style: TextStyle(
+// //                       fontSize: screenWidth * 0.04,
+// //                       color: Colors.black38,
+// //                     ),
+// //                   ),
+// //                 ),
+// //               ],
+// //             ),
+// //           ],
+// //         ),
+// //       ),
+// //     );
+// //   }
+// // }
+
+
+
+
+
+
+
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
-// import 'package:time_sheet_app/features/comment/view/comment_display_view.dart';
+// import 'package:time_sheet_app/features/comment/view/comment_view.dart';
 // import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
-// import 'package:time_sheet_app/features/show_tasks/providers/timesheet_status_provider.dart';
+// import 'package:time_sheet_app/features/show_tasks/views/old_1_show.dart';
 // import 'package:time_sheet_app/features/show_tasks/views/show_tasks_view.dart';
-
-// import 'package:time_sheet_app/view/add_comment_page.dart';
-// // import 'package:time_sheet_app/view/showtaskpage.dart';
 
 // class ProjectDetailedPage extends ConsumerStatefulWidget {
 //   final String title;
@@ -107,40 +1100,35 @@
 
 // class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
 //   double opacity = 1.0;
+
 //   @override
 //   void initState() {
 //     super.initState();
-//     // Fetch tasks when the page loads
 //     WidgetsBinding.instance.addPostFrameCallback((_) {
 //       ref.read(taskUserProvider.notifier).fetchTask(context: context);
 //     });
 //   }
 
+
 //   Future<void> _refreshTasks() async {
 //     setState(() {
-//       opacity = 0.1; // Start fade-out animation
+//       opacity = 0.1;
 //     });
 
-//     await Future.delayed(const Duration(milliseconds: 300)); // Wait for fade-out
+//     await Future.delayed(const Duration(milliseconds: 300));
 
-//     // Fetch tasks
 //     await ref.read(taskUserProvider.notifier).fetchTask(context: context);
 
 //     setState(() {
-//       opacity = 1.0; // Start fade-in animation
+//       opacity = 1.0;
 //     });
 //   }
 
 //   @override
 //   Widget build(BuildContext context) {
+//     final taskResponse = ref.watch(taskUserProvider);
 //     final screenWidth = MediaQuery.of(context).size.width;
-//     final tasks = ref.watch(taskUserProvider);
-//     // final projecTitle = ref.read(selectProjectTitleProvider);
-// final projectTitle =
-//         ref.read(selectProjectTitleProvider) ;
-//         print(projectTitle);
-//  final status =    ref.read(selectedTimesheetStatusProvider);
-        
+//     final projectTitle = ref.read(selectProjectTitleProvider);
 
 //     return Scaffold(
 //       appBar: AppBar(
@@ -151,21 +1139,19 @@
 //           onPressed: () => Navigator.pop(context),
 //         ),
 //         title: Text(
-//         // projectTitle!,
 //           widget.title,
 //           style: const TextStyle(color: Colors.white),
 //         ),
 //       ),
-//       body:  RefreshIndicator(
+//       body: RefreshIndicator(
 //         onRefresh: _refreshTasks,
-        
 //         child: SingleChildScrollView(
 //           padding: const EdgeInsets.all(16.0),
-//            physics: const AlwaysScrollableScrollPhysics(),
+//           physics: const AlwaysScrollableScrollPhysics(),
 //           child: Column(
 //             crossAxisAlignment: CrossAxisAlignment.start,
 //             children: [
-//               // Description Card
+//               // Project Info Card
 //               Card(
 //                 shape: RoundedRectangleBorder(
 //                   borderRadius: BorderRadius.circular(12),
@@ -193,7 +1179,30 @@
 //                 ),
 //               ),
 //               const SizedBox(height: 20),
-                  
+
+//               // Tasks Summary
+//               if (taskResponse != null) ...[
+//                 Text(
+//                   'Task Overview',
+//                   style: TextStyle(
+//                     fontSize: screenWidth > 600 ? 20 : 16,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 10),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                   children: [
+//                     _taskSummaryCard('Total Tasks', taskResponse.totalTasks),
+//                     _taskSummaryCard('Completed', taskResponse.totalCompleted),
+//                     _taskSummaryCard('Pending', taskResponse.totalPending),
+//                     _taskSummaryCard(
+//                         'In Progress', taskResponse.totalInProgress),
+//                   ],
+//                 ),
+//                 const SizedBox(height: 20),
+//               ],
+
 //               // Tasks Header
 //               Text(
 //                 'Tasks',
@@ -203,35 +1212,60 @@
 //                 ),
 //               ),
 //               const SizedBox(height: 10),
-                  
+
 //               // Task List
-//               tasks.isEmpty
-//                   ? const Center(
-//                       child: Text(
-//                         "No tasks available.",
-//                         style: TextStyle(fontSize: 16),
+//               if (taskResponse == null || taskResponse.tasks.isEmpty)
+//                 const Center(
+//                   child: Text(
+//                     "No tasks available.",
+//                     style: TextStyle(fontSize: 16),
+//                   ),
+//                 )
+//               else
+//                 ListView.builder(
+//                   shrinkWrap: true,
+//                   physics: const NeverScrollableScrollPhysics(),
+//                   itemCount: taskResponse.tasks.length,
+//                   itemBuilder: (context, index) {
+//                     final task = taskResponse.tasks[index];
+//                     return AnimatedOpacity(
+//                       opacity: opacity,
+//                       duration: const Duration(milliseconds: 300),
+//                       child: TaskCard(
+//                         status: task.status,
+//                         taskId: task.taskAssignmentId.toString(),
+//                         taskTitle: task.taskTitle,
+//                         taskDescription: task.taskDescription ?? "No description available",
 //                       ),
-//                     )
-//                   : ListView.builder(
-//                       shrinkWrap: true,
-//                       physics: const NeverScrollableScrollPhysics(),
-//                       itemCount: tasks.length,
-//                       itemBuilder: (context, index) {
-//                         final task = tasks[index];
-//                         return  AnimatedOpacity(
-//                           opacity: opacity,
-//                           duration: const Duration(milliseconds: 300),
-//                           child:
-//                         TaskCard(
-//                           status: status,
-//                           taskId: task.id.toString(),
-//                           taskTitle: task.title,
-//                           taskDescription: task.description,
-//                           )
-//                         );
-                        
-//                       },
-//                     ),
+//                     );
+//                   },
+//                 ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _taskSummaryCard(String title, int count) {
+//     return Expanded(
+//       child: Card(
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.circular(12),
+//         ),
+//         elevation: 3,
+//         child: Padding(
+//           padding: const EdgeInsets.all(12.0),
+//           child: Column(
+//             children: [
+//               Text(
+//                 count.toString(),
+//                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//               ),
+//               Text(
+//                 title,
+//                 style: const TextStyle(fontSize: 14, color: Colors.black54),
+//               ),
 //             ],
 //           ),
 //         ),
@@ -240,7 +1274,7 @@
 //   }
 // }
 
-// class TaskCard extends StatefulWidget {
+// class TaskCard extends StatelessWidget {
 //   final String taskId;
 //   final String taskTitle;
 //   final String taskDescription;
@@ -251,16 +1285,8 @@
 //     required this.taskId,
 //     required this.taskTitle,
 //     required this.taskDescription,
-//     required this.status
+//     required this.status,
 //   }) : super(key: key);
-
-//   @override
-//   _TaskCardState createState() => _TaskCardState();
-// }
-
-// class _TaskCardState extends State<TaskCard> {
-//   bool isExpanded = false;
-//   String selectedStatus = "To Do";
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -276,13 +1302,12 @@
 //         child: Column(
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             // Task Title and Show Task Button
 //             Row(
 //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //               children: [
 //                 Expanded(
 //                   child: Text(
-//                     widget.taskTitle,
+//                     taskTitle,
 //                     style: TextStyle(
 //                       fontSize: screenWidth > 600 ? 18 : 16,
 //                       fontWeight: FontWeight.bold,
@@ -295,9 +1320,9 @@
 //                       context,
 //                       MaterialPageRoute(
 //                         builder: (context) => ShowTaskPage(
-//                           taskId: widget.taskId,
-//                           title: widget.taskTitle,
-//                           description: widget.taskDescription,
+//                           taskId: taskId,
+//                           title: taskTitle,
+//                           description: taskDescription,
 //                         ),
 //                       ),
 //                     );
@@ -314,75 +1339,12 @@
 //               ],
 //             ),
 //             const SizedBox(height: 8),
-
-//             // Task Description with "Show More"/"Show Less"
 //             Text(
-//               isExpanded
-//                   ? widget.taskDescription
-//                   : widget.taskDescription.length > 50
-//                       ? '${widget.taskDescription.substring(0, 50)}...'
-//                       : widget.taskDescription,
-//               style: TextStyle(
-//                 fontSize: screenWidth > 600 ? 16 : 14,
-//               ),
-//             ),
-//             const SizedBox(height: 8),
-//             GestureDetector(
-//               onTap: () {
-//                 setState(() {
-//                   isExpanded = !isExpanded;
-//                 });
-//               },
-//               child: Text(
-//                 isExpanded ? 'Show Less' : 'Show More',
-//                 style: const TextStyle(
-//                   color: Colors.blue,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
+//               taskDescription,
+//               style: TextStyle(fontSize: screenWidth > 600 ? 16 : 14),
 //             ),
 //             const SizedBox(height: 16),
-
-//             // Buttons: Status Dropdown and Comments
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 RichText(
-//                   text: TextSpan(
-//                     text: 'Status:  ',
-//                     style: TextStyle(
-//                       fontSize: screenWidth * 0.04,
-//                       color: Colors.black87,
-//                     ),
-//                     children: [
-//                       TextSpan(
-//                         text: widget.status,
-//                         style: TextStyle(
-//                           color: Colors.red,
-//                           fontSize: screenWidth * 0.03,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 InkWell(
-//                   onTap: () {
-//                     Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                         builder: (context) => CommentDisplayView(taskId: int.parse(widget.taskId)),
-//                       ),
-//                     );
-//                   },
-//                   child: Icon(Icons.comment,
-                    
-                    
-//                       color: Colors.black87,
-//                     ),
-//                   ),
-                
-//               ],
-//             ),
+//             Text("Status: $status", style: const TextStyle(color: Colors.black54)),
 //           ],
 //         ),
 //       ),
@@ -394,24 +1356,13 @@
 
 
 
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_sheet_app/features/Project_details/provider/task_provider.dart';
-import 'package:time_sheet_app/features/comment/model/comment_display_model.dart';
-
 import 'package:time_sheet_app/features/comment/view/comment_view.dart';
 import 'package:time_sheet_app/features/home/provider/selected_project_provider.dart';
-import 'package:time_sheet_app/features/show_tasks/providers/timesheet_status_provider.dart';
-
 import 'package:time_sheet_app/features/show_tasks/views/old_1_show.dart';
-import 'package:time_sheet_app/features/show_tasks/views/show_tasks_view.dart';
 
-import 'package:time_sheet_app/view/add_comment_page.dart';
-
-import '../../show_tasks/views/old_show _task.dart';
-// import 'package:time_sheet_app/view/showtaskpage.dart';
 
 class ProjectDetailedPage extends ConsumerStatefulWidget {
   final String title;
@@ -429,10 +1380,14 @@ class ProjectDetailedPage extends ConsumerStatefulWidget {
 
 class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
   double opacity = 1.0;
+
+
+   // Function to get text color based on status
+ 
+
   @override
   void initState() {
     super.initState();
-    // Fetch tasks when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(taskUserProvider.notifier).fetchTask(context: context);
     });
@@ -440,29 +1395,23 @@ class _ProjectDetailedPageState extends ConsumerState<ProjectDetailedPage> {
 
   Future<void> _refreshTasks() async {
     setState(() {
-      opacity = 0.1; // Start fade-out animation
+      opacity = 0.1;
     });
 
-    await Future.delayed(const Duration(milliseconds: 300)); // Wait for fade-out
+    await Future.delayed(const Duration(milliseconds: 300));
 
-    // Fetch tasks
     await ref.read(taskUserProvider.notifier).fetchTask(context: context);
 
     setState(() {
-      opacity = 1.0; // Start fade-in animation
+      opacity = 1.0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final tasks = ref.watch(taskUserProvider);
-    // final projecTitle = ref.read(selectProjectTitleProvider);
-final projectTitle =
-        ref.read(selectProjectTitleProvider) ;
-        print(projectTitle);
- final status =    ref.read(selectedTimesheetStatusProvider);
-        
+    final taskResponse = ref.watch(taskUserProvider);
+    final projectTitle = ref.read(selectProjectTitleProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -473,21 +1422,19 @@ final projectTitle =
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-        // projectTitle!,
           widget.title,
           style: const TextStyle(color: Colors.white),
         ),
       ),
-      body:  RefreshIndicator(
+      body: RefreshIndicator(
         onRefresh: _refreshTasks,
-        
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
-           physics: const AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Description Card
+              // Project Info Card
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -515,7 +1462,7 @@ final projectTitle =
                 ),
               ),
               const SizedBox(height: 20),
-                  
+
               // Tasks Header
               Text(
                 'Tasks',
@@ -525,48 +1472,34 @@ final projectTitle =
                 ),
               ),
               const SizedBox(height: 10),
-                  
+
               // Task List
-              tasks.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "No tasks available.",
-                        style: TextStyle(fontSize: 16),
+              if (taskResponse == null || taskResponse.tasks.isEmpty)
+                const Center(
+                  child: Text(
+                    "No tasks available.",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: taskResponse.tasks.length,
+                  itemBuilder: (context, index) {
+                    final task = taskResponse.tasks[index];
+                    return AnimatedOpacity(
+                      opacity: opacity,
+                      duration: const Duration(milliseconds: 300),
+                      child: TaskCard(
+                        status: task.status,
+                        taskId: task.taskAssignmentId.toString(),
+                        taskTitle: task.taskTitle,
+                        taskDescription: task.taskDescription ?? "No description available",
                       ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: tasks.length,
-                      itemBuilder: (context, index) {
-                        final task = tasks[index];
-                        return  AnimatedOpacity(
-                          opacity: opacity,
-                          duration: const Duration(milliseconds: 300),
-                          child:
-                        
-                        // TaskCard(
-                        //   status: task.status ,
-                        //   taskId: task.taskAssignmentId.toString(),
-                        //   taskTitle: task.taskTitle,
-                        //   taskDescription: task.taskDescription,
-                        //   )
-
-                        TaskCard(
-                              status: task
-                                  .status, // Assuming status is always non-null
-                              taskId: task.taskAssignmentId
-                                  .toString(), // Convert int to String safely
-                              taskTitle:
-                                  task.taskTitle, // Assuming it's non-null
-                              taskDescription: task.taskDescription ??
-                                  "No description available", // Handle null case
-                            )
-
-                        );
-                        
-                      },
-                    ),
+                    );
+                  },
+                ),
             ],
           ),
         ),
@@ -586,7 +1519,7 @@ class TaskCard extends ConsumerStatefulWidget {
     required this.taskId,
     required this.taskTitle,
     required this.taskDescription,
-    required this.status
+    required this.status,
   }) : super(key: key);
 
   @override
@@ -595,13 +1528,21 @@ class TaskCard extends ConsumerStatefulWidget {
 
 class _TaskCardState extends ConsumerState<TaskCard> {
   bool isExpanded = false;
-  String selectedStatus = "To Do";
-    
-  
+   Color _getStatusTextColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Colors.green;
+      case 'in_progress':
+        return const Color.fromARGB(255, 244, 165, 46);
+      case 'pending':
+        return const Color.fromARGB(255, 251, 45, 45); // Slightly darker yellow for visibility
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Card(
@@ -633,10 +1574,10 @@ class _TaskCardState extends ConsumerState<TaskCard> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ShowTaskPage(
-                          // taskAssignmentId: widget.taskId,
                           taskId: widget.taskId,
                           title: widget.taskTitle,
                           description: widget.taskDescription,
+                          status: widget.status,
                         ),
                       ),
                     );
@@ -682,25 +1623,32 @@ class _TaskCardState extends ConsumerState<TaskCard> {
             ),
             const SizedBox(height: 16),
 
-            // Buttons: Status Dropdown and Comments
+            // Task Status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Text(
+                //   "Status: ${widget.status}",
+                //   style: TextStyle(
+                //     fontSize: screenWidth * 0.04,
+                //     color: Colors.black54,
+                //   ),
+                // ),
                 RichText(
                   text: TextSpan(
                     text: 'Status:  ',
                     style: TextStyle(
                       fontSize: screenWidth * 0.04,
-                      color: Colors.black38,
+                      color: Colors.black87,
                     ),
                     children: [
                       TextSpan(
                         text: widget.status,
-                        // ref.watch(timesheetUpdateProvider.notifier).status,
-                        // text: widget.status,
+                        
                         style: TextStyle(
-                          color: Colors.red,
-                          fontSize: screenWidth * 0.03,
+                          color: _getStatusTextColor(widget.status), // Colored text
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.04,
                         ),
                       ),
                     ],
@@ -711,17 +1659,12 @@ class _TaskCardState extends ConsumerState<TaskCard> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CommentsView(taskId: int.parse(widget.taskId)),
+                        builder: (context) =>
+                            CommentsView(taskId: int.parse(widget.taskId)),
                       ),
                     );
                   },
-                  child: Text(
-                    "Comments",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      color: Colors.black38,
-                    ),
-                  ),
+                  child:Icon(Icons.comment_outlined)
                 ),
               ],
             ),
